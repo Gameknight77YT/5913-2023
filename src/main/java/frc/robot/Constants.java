@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.AnalogInput;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -33,23 +34,23 @@ public final class Constants {
 
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1; //  Set front left module drive motor ID
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2; //  Set front left module steer motor ID
-    public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 3; //  Set front left steer encoder ID
-    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(86.1328125); //  Measure and set front left steer offset
+    public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 3; //  Set front left steer encoder ID  86.1328125
+    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(153.984375); //  Measure and set front left steer offset
 
     public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 4; //  Set front right drive motor ID
     public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 5; //  Set front right steer motor ID
-    public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 6; // Set front right steer encoder ID
-    public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(250.048828125); //  Measure and set front right steer offset
+    public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 6; // Set front right steer encoder ID 250.048828125
+    public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(267.802734375); //  Measure and set front right steer offset
 
     public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 7; //  Set back left drive motor ID
     public static final int BACK_LEFT_MODULE_STEER_MOTOR = 8; //  Set back left steer motor ID
     public static final int BACK_LEFT_MODULE_STEER_ENCODER = 9; // Set back left steer encoder ID
-    public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(344.091796875); //  Measure and set back left steer offset
+    public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(340.6640625); //  Measure and set back left steer offset
 
     public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 10; //  Set back right drive motor ID
     public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 11; //  Set back right steer motor ID
-    public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 12; //  Set back right steer encoder ID
-    public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(356.396484375); //  Measure and set back right steer offset
+    public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 12; //  Set back right steer encoder ID 356.396484375
+    public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(269.47265625); //  Measure and set back right steer offset
 
     /**
    * The maximum voltage that will be delivered to the drive motors.
@@ -74,7 +75,7 @@ public final class Constants {
           0.10033 * Math.PI)/3; //SdsModuleConfigurations.MK4_L1.getWheelDiameter()
 
   public static final double MAX_acceleration_METERS_PER_SECOND = 
-          MAX_VELOCITY_METERS_PER_SECOND/2;
+          MAX_VELOCITY_METERS_PER_SECOND;
   /**
    * The maximum angular velocity of the robot in radians per second.
    * <p>
@@ -107,6 +108,16 @@ public final class Constants {
     public static final double kSLeft = 0.57966;
     public static final double kVLeft = 2.7381;
     public static final double kALeft = 0.069151;
+
+    
+    public static final double intakeSpeed = .50;
+    public static final int intakeMotorID = 16;
+    public static final int armMotorID = 14;
+    public static final int linearActuatorID = 17;
+    public static final int potentiometerID = 0;
+
+
+
 
     
 }

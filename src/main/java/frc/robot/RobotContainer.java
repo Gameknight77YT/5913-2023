@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.HashMap;
 
@@ -17,11 +18,14 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.ControlIntake;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Intake;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -31,7 +35,11 @@ import frc.robot.subsystems.Drivetrain;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final Drivetrain drivetrain = new Drivetrain();
+  private final Drivetrain drivetrain;
+  private final Intake intake;
+
+  public final DefaultDriveCommand defaultDriveCommand;
+  private final ControlIntake controlIntake;
 
   private final XboxController controller = new XboxController(0);
 
@@ -39,18 +47,31 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    drivetrain = new Drivetrain();
+    intake = new Intake();
     // Set up the default command for the drivetrain.
     // The controls are for field-oriented driving:
     // Left stick Y axis -> forward and backwards movement
     // Left stick X axis -> left and right movement
     // Right stick X axis -> rotation
-    drivetrain.setDefaultCommand(new DefaultDriveCommand(
-            drivetrain,
-            () -> -modifyAxis(controller.getLeftY()) * Constants.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> -modifyAxis(controller.getLeftX()) * Constants.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> -modifyAxis(controller.getRightX()) * Constants.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
-    ));
+    defaultDriveCommand = new DefaultDriveCommand(
+      drivetrain,
+      () -> -modifyAxis(controller.getLeftY()) * Constants.MAX_VELOCITY_METERS_PER_SECOND,
+      () -> -modifyAxis(controller.getLeftX()) * Constants.MAX_VELOCITY_METERS_PER_SECOND,
+      () -> -modifyAxis(controller.getRightX()) * Constants.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
+      () -> controller.getLeftBumper()
+    );
+    
+    drivetrain.setDefaultCommand(defaultDriveCommand);
 
+    controlIntake = new ControlIntake(
+      intake, 
+      controller::getAButton, 
+      controller::getBButton
+      );
+
+
+    intake.setDefaultCommand(controlIntake);
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -64,8 +85,9 @@ public class RobotContainer {
   private void configureButtonBindings() {
     //  button zeros the gyroscope
     new Trigger(controller::getRightBumper)
-            .onTrue( new InstantCommand(() -> drivetrain.zeroGyroscope()));
-   
+      .onTrue( new InstantCommand(() -> drivetrain.zeroGyroscope()));
+    
+    
   }
 
   /**

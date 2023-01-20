@@ -163,6 +163,7 @@ public class Drivetrain extends SubsystemBase {
     odometry =  
         new SwerveDriveOdometry(Constants.kinematics, getGyroscopeRotation(), getSwerveModulePositions());
     
+        
   }
 
   public SwerveModulePosition[] getSwerveModulePositions(){
@@ -205,6 +206,14 @@ public class Drivetrain extends SubsystemBase {
     return navx.getRotation2d();//Rotation2d.fromDegrees(Math.IEEEremainder(navx.getAngle(), 360));//Rotation2d.fromDegrees(360.0 - navx.getYaw());
   }
 
+  public double getPitch(){
+        return navx.getPitch();
+  }
+
+  public double getRoll(){
+        return navx.getRoll();
+  }
+
   
 
   /**
@@ -233,6 +242,7 @@ public class Drivetrain extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] inputStates) {
         states = inputStates;
         
+        
   }
 
   public void stopDrive(){
@@ -247,7 +257,7 @@ public class Drivetrain extends SubsystemBase {
 
             moduleStates[i] = new SwerveModuleState(module.getDriveVelocity(), new Rotation2d(module.getSteerAngle()));
         }
-        states = moduleStates;
+        //states = moduleStates;
         pose = odometry.update(getGyroscopeRotation(), getSwerveModulePositions());
         field2d.setRobotPose(pose);
     }
@@ -261,19 +271,20 @@ public class Drivetrain extends SubsystemBase {
         SmartDashboard.putNumber("gyro Heading", getGyroscopeRotation().getDegrees());
         SmartDashboard.putNumber("Robot Heading", getPose().getRotation().getDegrees());
         SmartDashboard.putString("Robot Location", getPose().getX() + ", " + getPose().getY());
-
+        SmartDashboard.putData(field2d);
         SwerveDriveKinematics.desaturateWheelSpeeds(
                 states, Constants.MAX_VELOCITY_METERS_PER_SECOND);
 
-                //frontLeftModule.set(states[0].speedMetersPerSecond / Constants.MAX_VELOCITY_METERS_PER_SECOND * Constants.MAX_VOLTAGE, states[0].angle.getRadians());
-                //frontRightModule.set(states[1].speedMetersPerSecond / Constants.MAX_VELOCITY_METERS_PER_SECOND * Constants.MAX_VOLTAGE, states[1].angle.getRadians());
-                //backLeftModule.set(states[2].speedMetersPerSecond / Constants.MAX_VELOCITY_METERS_PER_SECOND * Constants.MAX_VOLTAGE, states[2].angle.getRadians());
-                //backRightModule.set(states[3].speedMetersPerSecond / Constants.MAX_VELOCITY_METERS_PER_SECOND * Constants.MAX_VOLTAGE, states[3].angle.getRadians());
+        //frontLeftModule.set(states[0].speedMetersPerSecond / Constants.MAX_VELOCITY_METERS_PER_SECOND * Constants.MAX_VOLTAGE, states[0].angle.getRadians());
+        //frontRightModule.set(states[1].speedMetersPerSecond / Constants.MAX_VELOCITY_METERS_PER_SECOND * Constants.MAX_VOLTAGE, states[1].angle.getRadians());
+        //backLeftModule.set(states[2].speedMetersPerSecond / Constants.MAX_VELOCITY_METERS_PER_SECOND * Constants.MAX_VOLTAGE, states[2].angle.getRadians());
+        //backRightModule.set(states[3].speedMetersPerSecond / Constants.MAX_VELOCITY_METERS_PER_SECOND * Constants.MAX_VOLTAGE, states[3].angle.getRadians());
 
-                frontLeftModule.set(feedforwardLeft.calculate(states[0].speedMetersPerSecond), states[0].angle.getRadians());
-                frontRightModule.set(feedforwardRight.calculate(states[1].speedMetersPerSecond), states[1].angle.getRadians());
-                backLeftModule.set(feedforwardLeft.calculate(states[2].speedMetersPerSecond), states[2].angle.getRadians());
-                backRightModule.set(feedforwardRight.calculate(states[3].speedMetersPerSecond), states[3].angle.getRadians());
+        frontLeftModule.set(feedforwardLeft.calculate(states[0].speedMetersPerSecond), states[0].angle.getRadians());
+        frontRightModule.set(feedforwardRight.calculate(states[1].speedMetersPerSecond), states[1].angle.getRadians());
+        backLeftModule.set(feedforwardLeft.calculate(states[2].speedMetersPerSecond), states[2].angle.getRadians());
+        backRightModule.set(feedforwardRight.calculate(states[3].speedMetersPerSecond), states[3].angle.getRadians());
+                
   }
 
 
