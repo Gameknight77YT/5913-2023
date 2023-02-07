@@ -16,8 +16,8 @@ public class DefaultDriveCommand extends CommandBase {
     private final DoubleSupplier m_rotationSupplier;
     private final BooleanSupplier isAutoBalance;
 
-    boolean autoBalanceXMode = false;
-    boolean autoBalanceYMode = false;
+    private boolean autoBalanceXMode = false;
+    private boolean autoBalanceYMode = false;
 
     public DefaultDriveCommand(Drivetrain drivetrainSubsystem,
                                DoubleSupplier translationXSupplier,

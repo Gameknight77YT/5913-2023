@@ -4,48 +4,128 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class arm extends SubsystemBase {
-  private TalonFX armMotor = new TalonFX(Constants.armMotorID);
-  private TalonSRX linearActuator = new TalonSRX(Constants.linearActuatorID);
+public class Arm extends SubsystemBase {
+  private TalonSRX armMotor = new TalonSRX(Constants.armMotorID);
+  private TalonSRX linearActuatorMaster = new TalonSRX(Constants.linearActuatorMasterID);
+  private VictorSPX linearActuatorFollower = new VictorSPX(Constants.linearActuatorSlaveID);
   private AnalogPotentiometer potentiometer = new AnalogPotentiometer(Constants.potentiometerID, 360*10);
   private PIDController armController = new PIDController(0, 0, 0);
-  private PIDController actuatorController = new PIDController(0, 0, 0);
+  private PIDController linearActuatorController = new PIDController(0, 0, 0);
 
-  /** Creates a new arm. */
-  public arm() {
+  public static enum State {
+    Starting,
+    NormalPickup,
+    GroundPickup,
+    MiddleCone,
+    MiddleCube,
+    HighCone,
+    HighCube,
+    LoadingStation
+  }
+
+  public State currentState = State.Starting;
+
+  /** Creates a new Arm. */
+  public Arm() {
     armMotor.configFactoryDefault();
-    linearActuator.configFactoryDefault();
+    linearActuatorMaster.configFactoryDefault();
+    linearActuatorFollower.follow(linearActuatorMaster);
 
     armMotor.setNeutralMode(NeutralMode.Brake);
-    linearActuator.setNeutralMode(NeutralMode.Brake);
+    linearActuatorMaster.setNeutralMode(NeutralMode.Brake);
+    linearActuatorFollower.setNeutralMode(NeutralMode.Brake);
 
-    armMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-    armMotor.setSelectedSensorPosition(0);
+    armMotor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.CTRE_MagEncoder_Absolute, 0, 0);
+    armMotor.configFeedbackNotContinuous(true, 0);
+
+    armMotor.setInverted(true);
+    linearActuatorMaster.setInverted(true);
+    linearActuatorFollower.setInverted(InvertType.FollowMaster);
   }
+
+  public void controlArm(double armSpeed, double actuatorSpeed){
+    armMotor.set(TalonSRXControlMode.PercentOutput, MathUtil.applyDeadband(armSpeed, .15));
+    linearActuatorMaster.set(TalonSRXControlMode.PercentOutput, MathUtil.applyDeadband(actuatorSpeed, .15));
+  }
+  
   /**
    * 
    * @param preset 
-   * 1 = starting config 
-   * 2 = transition
-   * 3 = middle
-   * 4 = high
    */
-  public void goToSetpoint(int preset){
-    
+  public void setState(State preset){
+    currentState = preset;
+  }
+
+  public boolean isAtSetpoint(){
+    return armController.atSetpoint() && linearActuatorController.atSetpoint();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    switch (currentState) {
+      case Starting:
+        linearActuatorController.setSetpoint(Constants.linearActuatorStartingSetpoint);
+        armController.setSetpoint(Constants.ArmStartingSetpoint);
+        break;
+
+      case NormalPickup:
+        linearActuatorController.setSetpoint(Constants.linearActuatortNormalPickupSetpoint);
+        armController.setSetpoint(Constants.ArmNormalPickupSetpoint);
+        break;
+
+      case GroundPickup:
+        linearActuatorController.setSetpoint(Constants.linearActuatortGroundPickupSetpoint);
+        armController.setSetpoint(Constants.ArmNormalGroundPickupSetpoint);
+        break;
+
+      case MiddleCone:
+        linearActuatorController.setSetpoint(Constants.linearActuatorMiddleConeSetpoint);
+        armController.setSetpoint(Constants.ArmMiddleConeSetpoint);
+        break;
+
+      case MiddleCube:
+        linearActuatorController.setSetpoint(Constants.linearActuatorMiddleCubeSetpoint);
+        armController.setSetpoint(Constants.ArmMiddleCubeSetpoint);
+        break;
+
+      case HighCone:
+        linearActuatorController.setSetpoint(Constants.linearActuatorHighConeSetpoint);
+        armController.setSetpoint(Constants.ArmHighConeSetpoint);
+        break;
+
+      case HighCube:
+        linearActuatorController.setSetpoint(Constants.linearActuatorHighCubeSetpoint);
+        armController.setSetpoint(Constants.ArmHighCubeSetpoint);
+        break;
+
+      case LoadingStation:
+        linearActuatorController.setSetpoint(Constants.linearActuatorLoadingStationSetpoint);
+        armController.setSetpoint(Constants.ArmLoadingStationSetpoint);
+        break;
+    
+      default:
+      DriverStation.reportError("invalid value", null);
+        break;
+    }
+
+    controlArm(
+      armController.calculate(armMotor.getSelectedSensorPosition()), 
+      linearActuatorController.calculate(potentiometer.get())
+      );
   }
 }

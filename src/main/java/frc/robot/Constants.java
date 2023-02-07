@@ -23,13 +23,13 @@ public final class Constants {
      *
      * Should be measured from center to center.
      */
-    public static final double DRIVETRAIN_TRACKWIDTH_METERS = Units.inchesToMeters(17); // Measure and set trackwidth
+    public static final double DRIVETRAIN_TRACKWIDTH_METERS = Units.inchesToMeters(24); // Measure and set trackwidth
     /**
      * The front-to-back distance between the drivetrain wheels.
      *
      * Should be measured from center to center.
      */
-    public static final double DRIVETRAIN_WHEELBASE_METERS = Units.inchesToMeters(17); // Measure and set wheelbase
+    public static final double DRIVETRAIN_WHEELBASE_METERS = Units.inchesToMeters(24); // Measure and set wheelbase
 
 
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1; //  Set front left module drive motor ID
@@ -97,8 +97,7 @@ public final class Constants {
     );
 
     
-    public static final double kPXController = 1.0;
-    public static final double kPYController = kPXController;
+    public static final double kPXYController = 1.0;
     public static final double kPThetaController = 1.0;
     public static final double kDThetaController = 0.5;
         
@@ -113,8 +112,26 @@ public final class Constants {
     public static final double intakeSpeed = .50;
     public static final int intakeMotorID = 16;
     public static final int armMotorID = 14;
-    public static final int linearActuatorID = 17;
+    public static final int linearActuatorMasterID = 17;
     public static final int potentiometerID = 0;
+    public static final int linearActuatorSlaveID = 0;
+    public static final double linearActuatorStartingSetpoint = 0;
+    public static final double ArmStartingSetpoint = 0;
+    public static final double linearActuatortNormalPickupSetpoint = 0;
+    public static final double ArmNormalPickupSetpoint = 0;
+    public static final double linearActuatortGroundPickupSetpoint = 0;
+    public static final double ArmNormalGroundPickupSetpoint = 0;
+    public static final double linearActuatorMiddleConeSetpoint = 0;
+    public static final double ArmMiddleConeSetpoint = 0;
+    public static final double linearActuatorMiddleCubeSetpoint = 0;
+    public static final double ArmMiddleCubeSetpoint = 0;
+    public static final double linearActuatorHighConeSetpoint = 0;
+    public static final double ArmHighConeSetpoint = 0;
+    public static final double linearActuatorHighCubeSetpoint = 0;
+    public static final double ArmHighCubeSetpoint = 0;
+    public static final double linearActuatorLoadingStationSetpoint = 0;
+    public static final double ArmLoadingStationSetpoint = 0;
+
 
 
 

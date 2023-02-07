@@ -5,18 +5,22 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
-  private TalonFX intakeMotor = new TalonFX(Constants.intakeMotorID);
-  public PIDController pidController = new PIDController(.0005, 0, 0);
+  private TalonSRX intakeMotor = new TalonSRX(Constants.intakeMotorID);
+  public PIDController pidController = new PIDController(.0009, 0, 0);
+  private double lastStallTime = 0;
+  private double startTime = 0;
+  private boolean isStall = false;
   /** Creates a new Intake. */
   public Intake() {
     intakeMotor.configFactoryDefault();
@@ -29,7 +33,9 @@ public class Intake extends SubsystemBase {
 
     intakeMotor.setInverted(true);
 
-    intakeMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+    intakeMotor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
+
+    intakeMotor.setSelectedSensorPosition(0);
 
     pidController.setTolerance(1000);
   }
@@ -38,16 +44,34 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run\
     SmartDashboard.putNumber("encoder", intakeMotor.getSelectedSensorPosition());
+    SmartDashboard.putNumber("speed", intakeMotor.getSelectedSensorVelocity());
+    SmartDashboard.putBoolean("isStall", isStall);
+    SmartDashboard.putNumber("time", RobotController.getFPGATime()/1000000);
+
   }
 
   public void controlIntake(double speed){
     if(speed != 0){
-      intakeMotor.set(TalonFXControlMode.PercentOutput, speed);
+      double time = RobotController.getFPGATime();
+      
+      if(intakeMotor.getSelectedSensorVelocity() == 0){
+        startTime = time;
+      }
+      if(time - startTime > 1*1000000 && intakeMotor.getSelectedSensorVelocity() < 8000){
+        speed = 0;
+        lastStallTime = time;
+        isStall = true;
+      }
+      if(time - lastStallTime < 2*1000000){
+        speed = 0;
+      }
+      
+      intakeMotor.set(TalonSRXControlMode.PercentOutput, speed);
     }else if(speed == 0){
       if(Math.abs(pidController.getSetpoint() - intakeMotor.getSelectedSensorPosition()) >= 1000){
         pidController.setSetpoint(intakeMotor.getSelectedSensorPosition());
       }
-      intakeMotor.set(TalonFXControlMode.PercentOutput, pidController.calculate(intakeMotor.getSelectedSensorPosition())/5);
+      intakeMotor.set(TalonSRXControlMode.PercentOutput, pidController.calculate(intakeMotor.getSelectedSensorPosition())/5);
       
     }
   }
