@@ -56,7 +56,6 @@ public class Drivetrain extends SubsystemBase {
   private final AHRS navx = new AHRS(Port.kMXP, (byte) 200); // NavX connected over MXP
 
   private Pose2d pose = new Pose2d();
-  private Field2d field2d = new Field2d();
 
    // Odometry class for tracking robot pose
    SwerveDriveOdometry odometry;
@@ -259,7 +258,7 @@ public class Drivetrain extends SubsystemBase {
         }
         //states = moduleStates;
         pose = odometry.update(getGyroscopeRotation(), getSwerveModulePositions());
-        field2d.setRobotPose(pose);
+        
     }
 
 
@@ -271,7 +270,7 @@ public class Drivetrain extends SubsystemBase {
         SmartDashboard.putNumber("gyro Heading", getGyroscopeRotation().getDegrees());
         SmartDashboard.putNumber("Robot Heading", getPose().getRotation().getDegrees());
         SmartDashboard.putString("Robot Location", getPose().getX() + ", " + getPose().getY());
-        SmartDashboard.putData(field2d);
+        
         SwerveDriveKinematics.desaturateWheelSpeeds(
                 states, Constants.MAX_VELOCITY_METERS_PER_SECOND);
 

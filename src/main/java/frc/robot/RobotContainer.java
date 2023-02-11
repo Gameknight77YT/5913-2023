@@ -45,7 +45,6 @@ public class RobotContainer {
   
 
   private final DefaultDriveCommand defaultDriveCommand;
-  private final ControlIntake controlIntake;
   private final ControlArm controlArm;
 
   private final XboxController controllerDriver = new XboxController(0);
@@ -73,19 +72,14 @@ public class RobotContainer {
     
     drivetrain.setDefaultCommand(defaultDriveCommand);
 
-    controlIntake = new ControlIntake(
-      intake, 
-      controllerManipulator::getAButton, 
-      controllerManipulator::getBButton
-      );
-
-
-    intake.setDefaultCommand(controlIntake);
+    
 
     controlArm = new ControlArm(
       arm, 
       controllerManipulator::getLeftY, 
-      controllerManipulator::getRightY
+      controllerManipulator::getRightY,
+      controllerManipulator::getBackButtonPressed,
+      controllerManipulator::getStartButtonPressed
       );
     
     arm.setDefaultCommand(controlArm);
@@ -117,7 +111,7 @@ public class RobotContainer {
       .onTrue(new MoveArmToSetpoint(arm, State.LoadingStation));
 
     new Trigger(controllerManipulator::getYButton)
-      .and(controllerManipulator::getLeftBumper).negate()
+      //.and(controllerManipulator::getLeftBumper).negate()
       .onTrue(new MoveArmToSetpoint(arm, State.HighCone));
     
     new Trigger(controllerManipulator::getYButton)
@@ -137,6 +131,7 @@ public class RobotContainer {
 
     new Trigger(controllerManipulator::getAButton)
       .onTrue(new MoveArmToSetpoint(arm, State.NormalPickup));
+    
     
     
   }
@@ -184,7 +179,7 @@ public class RobotContainer {
         );
 
         Command auto = autoBuilder.fullAuto(examplePath);
-
+      
       
       
 

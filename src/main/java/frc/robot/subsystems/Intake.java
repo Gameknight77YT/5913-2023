@@ -31,7 +31,7 @@ public class Intake extends SubsystemBase {
 
     intakeMotor.configOpenloopRamp(0);
 
-    intakeMotor.setInverted(true);
+    intakeMotor.setInverted(false);
 
     intakeMotor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
 
@@ -56,18 +56,28 @@ public class Intake extends SubsystemBase {
       
       if(intakeMotor.getSelectedSensorVelocity() == 0){
         startTime = time;
+        
       }
-      if(time - startTime > 1*1000000 && intakeMotor.getSelectedSensorVelocity() < 8000){
-        speed = 0;
-        lastStallTime = time;
-        isStall = true;
+      if(time - startTime > 1*1000000){
+        if(3000 > intakeMotor.getSelectedSensorVelocity() && intakeMotor.getSelectedSensorVelocity() > 0 ){
+          speed = 0;
+          lastStallTime = time;
+          isStall = true;
+        }else if(-4000 > intakeMotor.getSelectedSensorVelocity() && intakeMotor.getSelectedSensorVelocity() < 0 ){
+          speed = 0;
+          lastStallTime = time;
+          isStall = true;
+        }
+        
       }
-      if(time - lastStallTime < 2*1000000){
+      if(time - lastStallTime < 1*1000000){
         speed = 0;
+        
       }
       
       intakeMotor.set(TalonSRXControlMode.PercentOutput, speed);
     }else if(speed == 0){
+      isStall = false;
       if(Math.abs(pidController.getSetpoint() - intakeMotor.getSelectedSensorPosition()) >= 1000){
         pidController.setSetpoint(intakeMotor.getSelectedSensorPosition());
       }

@@ -72,7 +72,7 @@ public final class Constants {
   public static final double MAX_VELOCITY_METERS_PER_SECOND = 
           (6380.0 / 60.0 *
           (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0) * //SdsModuleConfigurations.MK4_L1.getDriveReduction()
-          0.10033 * Math.PI)/3; //SdsModuleConfigurations.MK4_L1.getWheelDiameter()
+          0.10033 * Math.PI); //SdsModuleConfigurations.MK4_L1.getWheelDiameter()
 
   public static final double MAX_acceleration_METERS_PER_SECOND = 
           MAX_VELOCITY_METERS_PER_SECOND;
@@ -83,7 +83,7 @@ public final class Constants {
    */
   // Here we calculate the theoretical maximum angular velocity. You can also replace this with a measured amount.
   public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
-          Math.hypot(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0);
+          Math.hypot(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0)/2;
 
           public final static SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
             // Front left
@@ -108,29 +108,41 @@ public final class Constants {
     public static final double kVLeft = 2.7381;
     public static final double kALeft = 0.069151;
 
-    
-    public static final double intakeSpeed = .50;
-    public static final int intakeMotorID = 16;
+    public static final int PDPID = 15;
     public static final int armMotorID = 14;
-    public static final int linearActuatorMasterID = 17;
+    public static final int intakeMotorID = 16;
+    public static final int pcmID = 17;
+    public static final int linearActuatorMasterID = 18;
+    public static final int linearActuatorSlaveID = 19;
+    public static final int ArmCANCoderID = 20;
+
     public static final int potentiometerID = 0;
-    public static final int linearActuatorSlaveID = 0;
-    public static final double linearActuatorStartingSetpoint = 0;
-    public static final double ArmStartingSetpoint = 0;
-    public static final double linearActuatortNormalPickupSetpoint = 0;
-    public static final double ArmNormalPickupSetpoint = 0;
+
+    public static final int inArmPistonsForward = 2;
+    public static final int inArmPistonsReverse = 3;
+    public static final int intakePistonsForward = 0;
+    public static final int intakePistonsReverse = 1;
+
+    
+    public static final double intakeSpeed = .75;
+    public static final double linearActuatorStartingSetpoint = 110;
+    public static final double ArmStartingSetpoint = 12;
+    public static final double linearActuatortNormalPickupSetpoint = 809;
+    public static final double ArmNormalPickupSetpoint = 18;
+    public static final double linearActuatorTansitionSetpoint = 110;
+    public static final double ArmTansitionSetpoint = 30;
     public static final double linearActuatortGroundPickupSetpoint = 0;
     public static final double ArmNormalGroundPickupSetpoint = 0;
     public static final double linearActuatorMiddleConeSetpoint = 0;
     public static final double ArmMiddleConeSetpoint = 0;
     public static final double linearActuatorMiddleCubeSetpoint = 0;
     public static final double ArmMiddleCubeSetpoint = 0;
-    public static final double linearActuatorHighConeSetpoint = 0;
-    public static final double ArmHighConeSetpoint = 0;
+    public static final double linearActuatorHighConeSetpoint = 110;
+    public static final double ArmHighConeSetpoint = 40;
     public static final double linearActuatorHighCubeSetpoint = 0;
     public static final double ArmHighCubeSetpoint = 0;
-    public static final double linearActuatorLoadingStationSetpoint = 0;
-    public static final double ArmLoadingStationSetpoint = 0;
+    public static final double linearActuatorLoadingStationSetpoint = 433;
+    public static final double ArmLoadingStationSetpoint = 78;
 
 
 
