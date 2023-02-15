@@ -13,7 +13,9 @@ import frc.robot.subsystems.Arm.State;
 public class MoveArmToSetpoint extends CommandBase {
   private Arm arm;
   private State state;
-  private Boolean passedTansition = false;
+  private Boolean armFirst;
+  private State currentState;
+  private boolean passedTransition = false;
   private Timer timer = new Timer();
 
   /** Creates a new MoveArmToSetpoint. 
@@ -30,13 +32,27 @@ public class MoveArmToSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    if(currentState == State.Starting ){
+      armFirst = true;
+    }else if(state == State.Starting || currentState == State.GroundPickup || 
+      currentState == State.NormalPickup || currentState == State.HighCone || 
+       currentState == State.HighCube || currentState == State.LoadingStation ||
+       currentState == State.MiddleCone || currentState == State.MiddleCube){
+
+      armFirst = false;
+    }else{
+      armFirst = true;
+    }
+    arm.armFirst = armFirst;
+
     if((arm.currentState == State.Starting && (state == State.NormalPickup || state == State.GroundPickup)) || 
       (arm.currentState == State.NormalPickup && state == State.Starting)  || 
       (arm.currentState == State.GroundPickup && state == State.Starting)
       ){
         timer.reset();
-        
+        timer.start();
       }
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -48,14 +64,14 @@ public class MoveArmToSetpoint extends CommandBase {
       (arm.currentState == State.Tansition)
       ){
         arm.setState(State.Tansition);
-        if(arm.isAtSetpoint()){
-          passedTansition = true;
+        if(arm.isAtSetpoint() || timer.get() > .75){
+          passedTransition = true;
         }
       }else{
-        passedTansition = true;
+        passedTransition = true;
       }
     
-    if(passedTansition){
+    if(passedTransition){
       arm.setState(state);
     }
     
@@ -63,12 +79,13 @@ public class MoveArmToSetpoint extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {;
+  public void end(boolean interrupted) {
+    passedTransition = false;
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return arm.isAtSetpoint() && passedTansition;
+    return arm.isAtSetpoint() && passedTransition;
   }
 }

@@ -48,6 +48,7 @@ public class ControlArm extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     arm.controlArm(0, 0);
+    
   }
 
   // Returns true when the command should end.

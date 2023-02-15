@@ -99,10 +99,20 @@ public class RobotContainer {
       .onTrue( new InstantCommand(() -> drivetrain.zeroGyroscope()));
 
     new Trigger(getRightTrigger(controllerDriver))
-      .whileTrue(new IntakeGamepiece(intake, !controllerDriver.getLeftBumper()));
+      .and(new Trigger(controllerDriver::getLeftBumper).negate())
+      .whileTrue(new IntakeGamepiece(intake, true));
+
+    new Trigger(getRightTrigger(controllerDriver))
+      .and(new Trigger(controllerDriver::getLeftBumper))
+      .whileTrue(new IntakeGamepiece(intake, false));
 
     new Trigger(controllerDriver::getRightBumper)
-      .whileTrue(new OuttakeGamepiece(intake, !controllerDriver.getLeftBumper()));
+      .and(new Trigger(controllerDriver::getLeftBumper).negate())
+      .whileTrue(new OuttakeGamepiece(intake, true));
+
+    new Trigger(controllerDriver::getRightBumper)
+      .and(new Trigger(controllerDriver::getLeftBumper))
+      .whileTrue(new OuttakeGamepiece(intake, false));
 
     new Trigger(getRightTrigger(controllerManipulator))
       .onTrue(new MoveArmToSetpoint(arm, State.GroundPickup));
@@ -111,7 +121,7 @@ public class RobotContainer {
       .onTrue(new MoveArmToSetpoint(arm, State.LoadingStation));
 
     new Trigger(controllerManipulator::getYButton)
-      //.and(controllerManipulator::getLeftBumper).negate()
+      .and(new Trigger(controllerManipulator::getLeftBumper).negate())
       .onTrue(new MoveArmToSetpoint(arm, State.HighCone));
     
     new Trigger(controllerManipulator::getYButton)
@@ -119,7 +129,7 @@ public class RobotContainer {
       .onTrue(new MoveArmToSetpoint(arm, State.HighCube));
 
     new Trigger(controllerManipulator::getXButton)
-      .and(controllerManipulator::getLeftBumper).negate()
+      .and(new Trigger(controllerManipulator::getLeftBumper).negate())
       .onTrue(new MoveArmToSetpoint(arm, State.MiddleCone));
     
     new Trigger(controllerManipulator::getXButton)

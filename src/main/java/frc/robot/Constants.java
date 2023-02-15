@@ -126,23 +126,23 @@ public final class Constants {
     
     public static final double intakeSpeed = .75;
     public static final double linearActuatorStartingSetpoint = 110;
-    public static final double ArmStartingSetpoint = 12;
+    public static final double ArmStartingSetpoint = 19;
     public static final double linearActuatortNormalPickupSetpoint = 809;
-    public static final double ArmNormalPickupSetpoint = 18;
+    public static final double ArmNormalPickupSetpoint = 26;
     public static final double linearActuatorTansitionSetpoint = 110;
-    public static final double ArmTansitionSetpoint = 30;
-    public static final double linearActuatortGroundPickupSetpoint = 0;
-    public static final double ArmNormalGroundPickupSetpoint = 0;
-    public static final double linearActuatorMiddleConeSetpoint = 0;
-    public static final double ArmMiddleConeSetpoint = 0;
-    public static final double linearActuatorMiddleCubeSetpoint = 0;
-    public static final double ArmMiddleCubeSetpoint = 0;
-    public static final double linearActuatorHighConeSetpoint = 110;
-    public static final double ArmHighConeSetpoint = 40;
-    public static final double linearActuatorHighCubeSetpoint = 0;
-    public static final double ArmHighCubeSetpoint = 0;
+    public static final double ArmTansitionSetpoint = 40;
+    public static final double linearActuatortGroundPickupSetpoint = 809;
+    public static final double ArmNormalGroundPickupSetpoint =  26;
+    public static final double linearActuatorMiddleConeSetpoint = 327;
+    public static final double ArmMiddleConeSetpoint = 67;
+    public static final double linearActuatorMiddleCubeSetpoint = linearActuatorMiddleConeSetpoint;
+    public static final double ArmMiddleCubeSetpoint = ArmMiddleConeSetpoint;
+    public static final double linearActuatorHighConeSetpoint = 1350;
+    public static final double ArmHighConeSetpoint = 142;
+    public static final double linearActuatorHighCubeSetpoint = 1350;
+    public static final double ArmHighCubeSetpoint = 130;
     public static final double linearActuatorLoadingStationSetpoint = 433;
-    public static final double ArmLoadingStationSetpoint = 78;
+    public static final double ArmLoadingStationSetpoint = 90;
 
 
 

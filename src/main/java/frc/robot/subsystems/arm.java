@@ -36,8 +36,8 @@ public class Arm extends SubsystemBase {
   private TalonSRX linearActuatorMaster = new TalonSRX(Constants.linearActuatorMasterID);
   private VictorSPX linearActuatorFollower = new VictorSPX(Constants.linearActuatorSlaveID);
   private AnalogPotentiometer potentiometer = new AnalogPotentiometer(Constants.potentiometerID, 360*10);
-  private PIDController armController = new PIDController(.025, 0.001, 0.0001);
-  private PIDController linearActuatorController = new PIDController(.01, 0, 0);
+  public PIDController armController = new PIDController(.027, 0.001, 0.0001);
+  public PIDController linearActuatorController = new PIDController(.003, 0, 0);
 
   private Compressor compressor = new Compressor(Constants.pcmID, PneumaticsModuleType.CTREPCM);
   private DoubleSolenoid inArmPistons = new DoubleSolenoid(Constants.pcmID, PneumaticsModuleType.CTREPCM, Constants.inArmPistonsForward, Constants.inArmPistonsReverse);
@@ -57,6 +57,7 @@ public class Arm extends SubsystemBase {
   }
 
   public State currentState = State.other;
+  public boolean armFirst;
 
   /** Creates a new Arm. */
   public Arm() {
@@ -83,8 +84,8 @@ public class Arm extends SubsystemBase {
     intakePistons.set(Value.kReverse);
 
     
-    armController.setTolerance(0.1);
-    linearActuatorController.setTolerance(0.1);
+    armController.setTolerance(1);
+    linearActuatorController.setTolerance(1);
   }
 
   public void controlPistons(Value inArm, Value intake){
@@ -98,6 +99,34 @@ public class Arm extends SubsystemBase {
 
   public void toggleIntakePistions(){
     intakePistons.toggle();
+  }
+
+  public boolean armAtSetpoint(){
+    return (Math.abs(armController.getSetpoint() - armCanCoder.getAbsolutePosition()) < 50);
+  }
+
+  public boolean actuatorAtSetpoint(){
+    return (Math.abs(linearActuatorController.getSetpoint() - potentiometer.get()) < 1000);
+  }
+
+  public void controlArm(){
+    double armSpeed = -armController.calculate(armCanCoder.getAbsolutePosition());
+    double actuatorSpeed = -linearActuatorController.calculate(potentiometer.get());
+
+    if(armFirst && !armAtSetpoint()){
+      armMotor.set(TalonFXControlMode.PercentOutput, armSpeed);
+      linearActuatorMaster.set(TalonSRXControlMode.PercentOutput, 0);
+    }else if(armFirst && armAtSetpoint()){
+      armMotor.set(TalonFXControlMode.PercentOutput, armSpeed);
+      linearActuatorMaster.set(TalonSRXControlMode.PercentOutput, actuatorSpeed);
+    }else if(!armFirst && !actuatorAtSetpoint()){
+      armMotor.set(TalonFXControlMode.PercentOutput, 0);
+      linearActuatorMaster.set(TalonSRXControlMode.PercentOutput, actuatorSpeed);
+    }else if(!armFirst && actuatorAtSetpoint()){
+      armMotor.set(TalonFXControlMode.PercentOutput, armSpeed);
+      linearActuatorMaster.set(TalonSRXControlMode.PercentOutput, actuatorSpeed);
+    }
+    
   }
 
   public void controlArm(double armSpeed, double actuatorSpeed){
@@ -159,28 +188,28 @@ public class Arm extends SubsystemBase {
         linearActuatorController.setSetpoint(Constants.linearActuatorMiddleConeSetpoint);
         armController.setSetpoint(Constants.ArmMiddleConeSetpoint);
         inArmPistons.set(Value.kReverse);
-        intakePistons.set(Value.kReverse);
+        intakePistons.set(Value.kForward);
         break;
 
       case MiddleCube:
         linearActuatorController.setSetpoint(Constants.linearActuatorMiddleCubeSetpoint);
         armController.setSetpoint(Constants.ArmMiddleCubeSetpoint);
         inArmPistons.set(Value.kReverse);
-        intakePistons.set(Value.kReverse);
+        intakePistons.set(Value.kForward);
         break;
 
       case HighCone:
         linearActuatorController.setSetpoint(Constants.linearActuatorHighConeSetpoint);
         armController.setSetpoint(Constants.ArmHighConeSetpoint);
         inArmPistons.set(Value.kReverse);
-        intakePistons.set(Value.kReverse);
+        intakePistons.set(Value.kForward);
         break;
 
       case HighCube:
         linearActuatorController.setSetpoint(Constants.linearActuatorHighCubeSetpoint);
         armController.setSetpoint(Constants.ArmHighCubeSetpoint);
         inArmPistons.set(Value.kReverse);
-        intakePistons.set(Value.kReverse);
+        intakePistons.set(Value.kForward);
         break;
 
       case LoadingStation:
@@ -199,10 +228,7 @@ public class Arm extends SubsystemBase {
         break;
     }
     if(!(currentState == State.other)){
-      controlArm(
-      -armController.calculate(armCanCoder.getAbsolutePosition()),
-      -linearActuatorController.calculate(potentiometer.get())
-      );
+      controlArm();
     }
     
   }
