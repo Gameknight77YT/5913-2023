@@ -152,8 +152,8 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putString("state", currentState.toString());
     SmartDashboard.putNumber("armCancoder", armCanCoder.getAbsolutePosition());
     SmartDashboard.putNumber("potentiometer", potentiometer.get());
-    SmartDashboard.putData(armController);
-    SmartDashboard.putData(linearActuatorController);
+    //SmartDashboard.putData(armController);
+    //SmartDashboard.putData(linearActuatorController);
     // This method will be called once per scheduler run
     switch (currentState) {
       case Starting:

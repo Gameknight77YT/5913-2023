@@ -21,6 +21,7 @@ public class Intake extends SubsystemBase {
   private double lastStallTime = 0;
   private double startTime = 0;
   private boolean isStall = false;
+  
   /** Creates a new Intake. */
   public Intake() {
     intakeMotor.configFactoryDefault();
@@ -33,7 +34,7 @@ public class Intake extends SubsystemBase {
 
     intakeMotor.setInverted(false);
 
-    intakeMotor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
+    intakeMotor.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 
     intakeMotor.setSelectedSensorPosition(0);
 
@@ -46,7 +47,7 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("encoder", intakeMotor.getSelectedSensorPosition());
     SmartDashboard.putNumber("speed", intakeMotor.getSelectedSensorVelocity());
     SmartDashboard.putBoolean("isStall", isStall);
-    SmartDashboard.putNumber("time", RobotController.getFPGATime()/1000000);
+    //SmartDashboard.putNumber("time", RobotController.getFPGATime()/1000000);
 
   }
 
@@ -54,16 +55,16 @@ public class Intake extends SubsystemBase {
     if(speed != 0){
       double time = RobotController.getFPGATime();
       
-      if(intakeMotor.getSelectedSensorVelocity() == 0){
+      if(Math.abs(intakeMotor.getSelectedSensorVelocity()) == 100){
         startTime = time;
         
       }
       if(time - startTime > 1*1000000){
-        if(3000 > intakeMotor.getSelectedSensorVelocity() && intakeMotor.getSelectedSensorVelocity() > 0 ){
+        if(2000 > intakeMotor.getSelectedSensorVelocity() && intakeMotor.getSelectedSensorVelocity() > 0 ){
           speed = 0;
           lastStallTime = time;
           isStall = true;
-        }else if(-4000 > intakeMotor.getSelectedSensorVelocity() && intakeMotor.getSelectedSensorVelocity() < 0 ){
+        }else if(-5000 > intakeMotor.getSelectedSensorVelocity() && intakeMotor.getSelectedSensorVelocity() < 0 ){
           speed = 0;
           lastStallTime = time;
           isStall = true;
@@ -81,7 +82,7 @@ public class Intake extends SubsystemBase {
       if(Math.abs(pidController.getSetpoint() - intakeMotor.getSelectedSensorPosition()) >= 1000){
         pidController.setSetpoint(intakeMotor.getSelectedSensorPosition());
       }
-      intakeMotor.set(TalonSRXControlMode.PercentOutput, pidController.calculate(intakeMotor.getSelectedSensorPosition())/5);
+      intakeMotor.set(TalonSRXControlMode.PercentOutput, pidController.calculate(intakeMotor.getSelectedSensorPosition())/2);
       
     }
   }

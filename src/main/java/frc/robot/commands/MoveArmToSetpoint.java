@@ -5,7 +5,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Arm.State;
@@ -13,7 +12,7 @@ import frc.robot.subsystems.Arm.State;
 public class MoveArmToSetpoint extends CommandBase {
   private Arm arm;
   private State state;
-  private Boolean armFirst;
+  private Boolean armFirst = null;
   private State currentState;
   private boolean passedTransition = false;
   private Timer timer = new Timer();
@@ -29,19 +28,27 @@ public class MoveArmToSetpoint extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
+  public MoveArmToSetpoint(Arm arm, State preset, Boolean armFirst){
+    this.armFirst = armFirst;
+    new MoveArmToSetpoint(arm, preset);
+  }
+
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if(currentState == State.Starting ){
-      armFirst = true;
-    }else if(state == State.Starting || currentState == State.GroundPickup || 
-      currentState == State.NormalPickup || currentState == State.HighCone || 
-       currentState == State.HighCube || currentState == State.LoadingStation ||
-       currentState == State.MiddleCone || currentState == State.MiddleCube){
+    if(armFirst == null){
+      if(currentState == State.Starting ){
+        armFirst = true;
+      }else if(state == State.Starting || currentState == State.GroundPickup || 
+        currentState == State.NormalPickup || currentState == State.HighCone || 
+        currentState == State.HighCube || currentState == State.LoadingStation ||
+        currentState == State.MiddleCone || currentState == State.MiddleCube || 
+        state == State.NormalPickup){
 
-      armFirst = false;
-    }else{
-      armFirst = true;
+        armFirst = false;
+      }else{
+        armFirst = true;
+      }
     }
     arm.armFirst = armFirst;
 

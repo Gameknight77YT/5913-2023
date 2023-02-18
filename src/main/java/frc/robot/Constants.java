@@ -23,13 +23,13 @@ public final class Constants {
      *
      * Should be measured from center to center.
      */
-    public static final double DRIVETRAIN_TRACKWIDTH_METERS = Units.inchesToMeters(24); // Measure and set trackwidth
+    public static final double DRIVETRAIN_TRACKWIDTH_METERS = Units.inchesToMeters(23); // Measure and set trackwidth
     /**
      * The front-to-back distance between the drivetrain wheels.
      *
      * Should be measured from center to center.
      */
-    public static final double DRIVETRAIN_WHEELBASE_METERS = Units.inchesToMeters(24); // Measure and set wheelbase
+    public static final double DRIVETRAIN_WHEELBASE_METERS = Units.inchesToMeters(23); // Measure and set wheelbase
 
 
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1; //  Set front left module drive motor ID
@@ -75,7 +75,7 @@ public final class Constants {
           0.10033 * Math.PI); //SdsModuleConfigurations.MK4_L1.getWheelDiameter()
 
   public static final double MAX_acceleration_METERS_PER_SECOND = 
-          MAX_VELOCITY_METERS_PER_SECOND;
+          MAX_VELOCITY_METERS_PER_SECOND/2;
   /**
    * The maximum angular velocity of the robot in radians per second.
    * <p>
@@ -131,8 +131,8 @@ public final class Constants {
     public static final double ArmNormalPickupSetpoint = 26;
     public static final double linearActuatorTansitionSetpoint = 110;
     public static final double ArmTansitionSetpoint = 40;
-    public static final double linearActuatortGroundPickupSetpoint = 809;
-    public static final double ArmNormalGroundPickupSetpoint =  26;
+    public static final double linearActuatortGroundPickupSetpoint = 1290;
+    public static final double ArmNormalGroundPickupSetpoint =  46;
     public static final double linearActuatorMiddleConeSetpoint = 327;
     public static final double ArmMiddleConeSetpoint = 67;
     public static final double linearActuatorMiddleCubeSetpoint = linearActuatorMiddleConeSetpoint;
@@ -141,8 +141,8 @@ public final class Constants {
     public static final double ArmHighConeSetpoint = 142;
     public static final double linearActuatorHighCubeSetpoint = 1350;
     public static final double ArmHighCubeSetpoint = 130;
-    public static final double linearActuatorLoadingStationSetpoint = 433;
-    public static final double ArmLoadingStationSetpoint = 90;
+    public static final double linearActuatorLoadingStationSetpoint = 719;
+    public static final double ArmLoadingStationSetpoint = 99;
 
 
 
