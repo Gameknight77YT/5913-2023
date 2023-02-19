@@ -4,13 +4,10 @@
 
 package frc.robot.subsystems;
 
-import javax.print.attribute.standard.MediaSize.Other;
-
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
-import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -22,10 +19,9 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PneumaticHub;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -36,7 +32,7 @@ public class Arm extends SubsystemBase {
   private TalonSRX linearActuatorMaster = new TalonSRX(Constants.linearActuatorMasterID);
   private VictorSPX linearActuatorFollower = new VictorSPX(Constants.linearActuatorSlaveID);
   private AnalogPotentiometer potentiometer = new AnalogPotentiometer(Constants.potentiometerID, 360*10);
-  public PIDController armController = new PIDController(.027, 0.001, 0.0001);
+  public PIDController armController = new PIDController(.03, 0.00, 0.000);
   public PIDController linearActuatorController = new PIDController(.003, 0, 0);
 
   private Compressor compressor = new Compressor(Constants.pcmID, PneumaticsModuleType.CTREPCM);
@@ -85,7 +81,7 @@ public class Arm extends SubsystemBase {
 
     
     armController.setTolerance(1);
-    linearActuatorController.setTolerance(1);
+    linearActuatorController.setTolerance(2);
   }
 
   public void controlPistons(Value inArm, Value intake){
@@ -112,17 +108,19 @@ public class Arm extends SubsystemBase {
   public void controlArm(){
     double armSpeed = -armController.calculate(armCanCoder.getAbsolutePosition());
     double actuatorSpeed = -linearActuatorController.calculate(potentiometer.get());
-
     if(armFirst && !armAtSetpoint()){
       armMotor.set(TalonFXControlMode.PercentOutput, armSpeed);
       linearActuatorMaster.set(TalonSRXControlMode.PercentOutput, 0);
     }else if(armFirst && armAtSetpoint()){
       armMotor.set(TalonFXControlMode.PercentOutput, armSpeed);
       linearActuatorMaster.set(TalonSRXControlMode.PercentOutput, actuatorSpeed);
+      setPistions();
     }else if(!armFirst && !actuatorAtSetpoint()){
       armMotor.set(TalonFXControlMode.PercentOutput, 0);
       linearActuatorMaster.set(TalonSRXControlMode.PercentOutput, actuatorSpeed);
+      setPistions();
     }else if(!armFirst && actuatorAtSetpoint()){
+      setPistions();
       armMotor.set(TalonFXControlMode.PercentOutput, armSpeed);
       linearActuatorMaster.set(TalonSRXControlMode.PercentOutput, actuatorSpeed);
     }
@@ -142,6 +140,63 @@ public class Arm extends SubsystemBase {
     currentState = preset;
   }
 
+  public void setPistions(){
+    switch (currentState) {
+      case Starting:
+        inArmPistons.set(Value.kReverse);
+        intakePistons.set(Value.kReverse);
+        break;
+
+      case Tansition:
+        inArmPistons.set(Value.kReverse);
+        intakePistons.set(Value.kReverse);
+        break;
+
+      case NormalPickup:
+        inArmPistons.set(Value.kReverse);
+        intakePistons.set(Value.kForward);
+        break;
+
+      case GroundPickup:
+        inArmPistons.set(Value.kForward);
+        intakePistons.set(Value.kForward);
+        break;
+
+      case MiddleCone:
+        inArmPistons.set(Value.kReverse);
+        intakePistons.set(Value.kForward);
+        break;
+
+      case MiddleCube:
+        inArmPistons.set(Value.kReverse);
+        intakePistons.set(Value.kForward);
+        break;
+
+      case HighCone:
+        inArmPistons.set(Value.kReverse);
+        intakePistons.set(Value.kForward);
+        break;
+
+      case HighCube:
+        inArmPistons.set(Value.kReverse);
+        intakePistons.set(Value.kForward);
+        break;
+
+      case LoadingStation:
+        inArmPistons.set(Value.kReverse);
+        intakePistons.set(Value.kForward);
+        break;
+
+      case other:
+        
+        break;
+
+      default:
+        DriverStation.reportError("invalid value", null);
+        break;
+    }
+  }
+
   public boolean isAtSetpoint(){
     
     return armController.atSetpoint() && linearActuatorController.atSetpoint();
@@ -159,64 +214,46 @@ public class Arm extends SubsystemBase {
       case Starting:
         linearActuatorController.setSetpoint(Constants.linearActuatorStartingSetpoint);
         armController.setSetpoint(Constants.ArmStartingSetpoint);
-        inArmPistons.set(Value.kReverse);
-        intakePistons.set(Value.kReverse);
         break;
 
       case Tansition:
         linearActuatorController.setSetpoint(Constants.linearActuatorTansitionSetpoint);
         armController.setSetpoint(Constants.ArmTansitionSetpoint);
-        inArmPistons.set(Value.kReverse);
-        intakePistons.set(Value.kReverse);
         break;
 
       case NormalPickup:
         linearActuatorController.setSetpoint(Constants.linearActuatortNormalPickupSetpoint);
         armController.setSetpoint(Constants.ArmNormalPickupSetpoint);
-        inArmPistons.set(Value.kReverse);
-        intakePistons.set(Value.kForward);
         break;
 
       case GroundPickup:
         linearActuatorController.setSetpoint(Constants.linearActuatortGroundPickupSetpoint);
         armController.setSetpoint(Constants.ArmNormalGroundPickupSetpoint);
-        inArmPistons.set(Value.kForward);
-        intakePistons.set(Value.kForward);
         break;
 
       case MiddleCone:
         linearActuatorController.setSetpoint(Constants.linearActuatorMiddleConeSetpoint);
         armController.setSetpoint(Constants.ArmMiddleConeSetpoint);
-        inArmPistons.set(Value.kReverse);
-        intakePistons.set(Value.kForward);
         break;
 
       case MiddleCube:
         linearActuatorController.setSetpoint(Constants.linearActuatorMiddleCubeSetpoint);
         armController.setSetpoint(Constants.ArmMiddleCubeSetpoint);
-        inArmPistons.set(Value.kReverse);
-        intakePistons.set(Value.kForward);
         break;
 
       case HighCone:
         linearActuatorController.setSetpoint(Constants.linearActuatorHighConeSetpoint);
         armController.setSetpoint(Constants.ArmHighConeSetpoint);
-        inArmPistons.set(Value.kReverse);
-        intakePistons.set(Value.kForward);
         break;
 
       case HighCube:
         linearActuatorController.setSetpoint(Constants.linearActuatorHighCubeSetpoint);
         armController.setSetpoint(Constants.ArmHighCubeSetpoint);
-        inArmPistons.set(Value.kReverse);
-        intakePistons.set(Value.kForward);
         break;
 
       case LoadingStation:
         linearActuatorController.setSetpoint(Constants.linearActuatorLoadingStationSetpoint);
         armController.setSetpoint(Constants.ArmLoadingStationSetpoint);
-        inArmPistons.set(Value.kReverse);
-        intakePistons.set(Value.kForward);
         break;
 
       case other:

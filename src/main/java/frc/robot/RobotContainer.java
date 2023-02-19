@@ -55,6 +55,7 @@ public class RobotContainer {
   private PathPlannerTrajectory Auto3High;
   private PathPlannerTrajectory Auto2High;
   private PathPlannerTrajectory Test;
+  private PathPlannerTrajectory LowGoal;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -95,6 +96,7 @@ public class RobotContainer {
     autoChooser.setDefaultOption("Auto2High", Auto2High);
     autoChooser.addOption("Auto3High", Auto3High);
     autoChooser.addOption("Test", Test);
+    autoChooser.addOption("lowGoal", Auto2High);
     SmartDashboard.putData(autoChooser);
     // Configure the button bindings
     configureButtonBindings();
@@ -200,6 +202,11 @@ public class RobotContainer {
 
     Test = PathPlanner.loadPath(
       "Test",
+      Constants.MAX_VELOCITY_METERS_PER_SECOND-1.5,
+      Constants.MAX_acceleration_METERS_PER_SECOND-1.5);
+
+    LowGoal = PathPlanner.loadPath(
+      "LowGoal",
       Constants.MAX_VELOCITY_METERS_PER_SECOND-1.5,
       Constants.MAX_acceleration_METERS_PER_SECOND-1.5);
   }

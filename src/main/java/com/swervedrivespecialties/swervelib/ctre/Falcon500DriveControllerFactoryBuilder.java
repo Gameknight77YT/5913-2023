@@ -60,6 +60,7 @@ public final class Falcon500DriveControllerFactoryBuilder {
             }
 
             TalonFX motor = new TalonFX(driveConfiguration);
+            motor.configFactoryDefault();
             motor.configAllSettings(motorConfiguration);
 
             if (hasVoltageCompensation()) {
@@ -72,6 +73,7 @@ public final class Falcon500DriveControllerFactoryBuilder {
             motor.setInverted(moduleConfiguration.isDriveInverted() ? TalonFXInvertType.Clockwise : TalonFXInvertType.CounterClockwise);
             motor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
             motor.setSensorPhase(true);
+            motor.clearStickyFaults();
 
             // Reduce CAN status frame rates
             motor.setStatusFramePeriod(

@@ -44,9 +44,9 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run\
-    SmartDashboard.putNumber("encoder", intakeMotor.getSelectedSensorPosition());
-    SmartDashboard.putNumber("speed", intakeMotor.getSelectedSensorVelocity());
-    SmartDashboard.putBoolean("isStall", isStall);
+    //SmartDashboard.putNumber("encoder", intakeMotor.getSelectedSensorPosition());
+    //SmartDashboard.putNumber("speed", intakeMotor.getSelectedSensorVelocity());
+    //SmartDashboard.putBoolean("isStall", isStall);
     //SmartDashboard.putNumber("time", RobotController.getFPGATime()/1000000);
 
   }

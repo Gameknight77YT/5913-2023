@@ -37,7 +37,7 @@ public class MoveArmToSetpoint extends CommandBase {
   @Override
   public void initialize() {
     if(armFirst == null){
-      if(currentState == State.Starting ){
+      if(currentState == State.Starting || (state == State.NormalPickup && currentState != State.Starting) ){
         armFirst = true;
       }else if(state == State.Starting || currentState == State.GroundPickup || 
         currentState == State.NormalPickup || currentState == State.HighCone || 

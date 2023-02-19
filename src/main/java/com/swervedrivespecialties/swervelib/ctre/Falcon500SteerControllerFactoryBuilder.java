@@ -114,6 +114,7 @@ public final class Falcon500SteerControllerFactoryBuilder {
             }
 
             TalonFX motor = new TalonFX(steerConfiguration.getMotorPort());
+            motor.configFactoryDefault();
             motor.configAllSettings(motorConfiguration, CAN_TIMEOUT_MS);
 
             if (hasVoltageCompensation()) {
@@ -123,6 +124,7 @@ public final class Falcon500SteerControllerFactoryBuilder {
             motor.setSensorPhase(moduleConfiguration.isSteerInverted());
             motor.setInverted(TalonFXInvertType.CounterClockwise);
             motor.setNeutralMode(NeutralMode.Brake);
+            motor.clearStickyFaults();
 
             motor.setSelectedSensorPosition(absoluteEncoder.getAbsoluteAngle() / sensorPositionCoefficient, 0, CAN_TIMEOUT_MS);
 
