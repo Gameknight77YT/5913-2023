@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.AnalogInput;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -115,6 +114,7 @@ public final class Constants {
     public static final int linearActuatorMasterID = 18;
     public static final int linearActuatorSlaveID = 19;
     public static final int ArmCANCoderID = 20;
+    public static final int CANdleID = 21;
 
     public static final int potentiometerID = 0;
 
@@ -125,24 +125,24 @@ public final class Constants {
 
     
     public static final double intakeSpeed = .75;
-    public static final double linearActuatorStartingSetpoint = 110;
-    public static final double ArmStartingSetpoint = 23;
-    public static final double linearActuatortNormalPickupSetpoint = 809;
-    public static final double ArmNormalPickupSetpoint = 28;
-    public static final double linearActuatorTansitionSetpoint = 110;
-    public static final double ArmTansitionSetpoint = 40;
-    public static final double linearActuatortGroundPickupSetpoint = 1290;
-    public static final double ArmNormalGroundPickupSetpoint =  46;
-    public static final double linearActuatorMiddleConeSetpoint = 327;
-    public static final double ArmMiddleConeSetpoint = 67;
+    public static final double linearActuatorStartingSetpoint = 8811;
+    public static final double ArmStartingSetpoint = 64;
+    public static final double linearActuatortNormalPickupSetpoint = 153820;
+    public static final double ArmNormalPickupSetpoint = 74;
+    public static final double linearActuatorTansitionSetpoint = 8811;
+    public static final double ArmTansitionSetpoint = 80;
+    public static final double linearActuatortGroundPickupSetpoint = 231114;
+    public static final double ArmGroundPickupSetpoint =  91;
+    public static final double linearActuatorMiddleConeSetpoint = 8811;
+    public static final double ArmMiddleConeSetpoint = 117;
     public static final double linearActuatorMiddleCubeSetpoint = linearActuatorMiddleConeSetpoint;
     public static final double ArmMiddleCubeSetpoint = ArmMiddleConeSetpoint;
-    public static final double linearActuatorHighConeSetpoint = 1155;
-    public static final double ArmHighConeSetpoint = 125; // maxed out = 130
-    public static final double linearActuatorHighCubeSetpoint = 1155;
-    public static final double ArmHighCubeSetpoint = 125;
-    public static final double linearActuatorLoadingStationSetpoint = 719;
-    public static final double ArmLoadingStationSetpoint = 99;
+    public static final double linearActuatorHighConeSetpoint = 210156;
+    public static final double ArmHighConeSetpoint = 179; 
+    public static final double linearActuatorHighCubeSetpoint = 210156;
+    public static final double ArmHighCubeSetpoint = 171;
+    public static final double linearActuatorLoadingStationSetpoint = 0;
+    public static final double ArmLoadingStationSetpoint = 132;
 
 
 

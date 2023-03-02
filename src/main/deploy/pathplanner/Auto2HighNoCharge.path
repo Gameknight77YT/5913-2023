@@ -54,15 +54,15 @@
     {
       "anchorPoint": {
         "x": 6.646452561432554,
-        "y": 4.314581218190348
+        "y": 4.282741924482887
       },
       "prevControl": {
         "x": 5.372880813134101,
-        "y": 4.370299982178405
+        "y": 4.338460688470945
       },
       "nextControl": {
         "x": 5.372880813134101,
-        "y": 4.370299982178405
+        "y": 4.338460688470945
       },
       "holonomicAngle": 0,
       "isReversal": true,
@@ -128,37 +128,12 @@
     },
     {
       "anchorPoint": {
-        "x": 2.4755050857551186,
-        "y": 3.112647880733683
+        "x": 4.226666239665492,
+        "y": 4.736451859814211
       },
       "prevControl": {
-        "x": 1.8689509805836937,
-        "y": 3.164426889711731
-      },
-      "nextControl": {
-        "x": 3.1282106067580764,
-        "y": 3.0569291167456254
-      },
-      "holonomicAngle": 180.0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": false,
-      "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 3.9719518900058017,
-        "y": 3.0728487635993567
-      },
-      "prevControl": {
-        "x": 3.5660008952356694,
-        "y": 3.080808587026222
+        "x": 3.6201121344940668,
+        "y": 4.78823086879226
       },
       "nextControl": null,
       "holonomicAngle": 180.0,
@@ -176,33 +151,33 @@
   ],
   "markers": [
     {
-      "position": 1.7181818181818176,
+      "position": 0.27272727272727276,
+      "names": [
+        "ToLow"
+      ]
+    },
+    {
+      "position": 1.7500000000000002,
       "names": [
         "IntakeCube"
       ]
     },
     {
-      "position": 2.1818181818181808,
+      "position": 2.3863636363636327,
       "names": [
         "ToHighCube"
       ]
     },
     {
-      "position": 3.89999999999999,
+      "position": 3.818181818181806,
       "names": [
         "OuttakeCube"
       ]
     },
     {
-      "position": 4.227272727272716,
+      "position": 4.227272727272714,
       "names": [
         "ToStart"
-      ]
-    },
-    {
-      "position": 0.32727272727272705,
-      "names": [
-        "ToLow"
       ]
     }
   ]

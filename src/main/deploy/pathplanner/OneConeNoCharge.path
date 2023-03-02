@@ -17,31 +17,35 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "OuttakeCone"
+          "ToHighCone",
+          "OuttakeCone",
+          "ToStart"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "minimum",
-        "waitTime": 1.0
+        "waitTime": 4.0
       }
     },
     {
       "anchorPoint": {
-        "x": 3.9055335050171895,
-        "y": 2.767177349301318
+        "x": 5.01468875892516,
+        "y": 2.7544558265247434
       },
       "prevControl": {
-        "x": 2.9055335050171895,
-        "y": 2.767177349301318
+        "x": 4.01468875892516,
+        "y": 2.7544558265247434
       },
       "nextControl": null,
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
+        "names": [
+          "ToLow"
+        ],
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }

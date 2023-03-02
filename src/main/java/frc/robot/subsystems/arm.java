@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
@@ -14,9 +15,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
@@ -31,9 +30,8 @@ public class Arm extends SubsystemBase {
   private CANCoder armCanCoder = new CANCoder(Constants.ArmCANCoderID);
   private TalonSRX linearActuatorMaster = new TalonSRX(Constants.linearActuatorMasterID);
   private VictorSPX linearActuatorFollower = new VictorSPX(Constants.linearActuatorSlaveID);
-  private AnalogPotentiometer potentiometer = new AnalogPotentiometer(Constants.potentiometerID, 360*10);
-  public PIDController armController = new PIDController(.03, 0.00, 0.000);
-  public PIDController linearActuatorController = new PIDController(.003, 0, 0);
+  private PIDController armController = new PIDController(.017, 0.00, 0.000);
+  private PIDController linearActuatorController = new PIDController(.000025, 0, 0);
 
   private Compressor compressor = new Compressor(Constants.pcmID, PneumaticsModuleType.CTREPCM);
   private DoubleSolenoid inArmPistons = new DoubleSolenoid(Constants.pcmID, PneumaticsModuleType.CTREPCM, Constants.inArmPistonsForward, Constants.inArmPistonsReverse);
@@ -72,7 +70,10 @@ public class Arm extends SubsystemBase {
     armCanCoder.configSensorDirection(true);
 
     armCanCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-    armCanCoder.configMagnetOffset(360 - 260);
+    armCanCoder.configMagnetOffset(360 - 320);
+
+    linearActuatorMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+    //linearActuatorMaster.setSelectedSensorPosition(0);
     
     compressor.enableDigital();
 
@@ -82,6 +83,8 @@ public class Arm extends SubsystemBase {
     
     armController.setTolerance(1);
     linearActuatorController.setTolerance(2);
+
+    
   }
 
   public void controlPistons(Value inArm, Value intake){
@@ -98,16 +101,16 @@ public class Arm extends SubsystemBase {
   }
 
   public boolean armAtSetpoint(){
-    return (Math.abs(armController.getSetpoint() - armCanCoder.getAbsolutePosition()) < 50);
+    return (Math.abs(armController.getSetpoint() - armCanCoder.getAbsolutePosition()) < 25);
   }
 
   public boolean actuatorAtSetpoint(){
-    return (Math.abs(linearActuatorController.getSetpoint() - potentiometer.get()) < 1000);
+    return (Math.abs(linearActuatorController.getSetpoint() - linearActuatorMaster.getSelectedSensorPosition()) < 100000);
   }
 
   public void controlArm(){
     double armSpeed = -armController.calculate(armCanCoder.getAbsolutePosition());
-    double actuatorSpeed = -linearActuatorController.calculate(potentiometer.get());
+    double actuatorSpeed = -linearActuatorController.calculate(linearActuatorMaster.getSelectedSensorPosition());
     if(armFirst && !armAtSetpoint()){
       armMotor.set(TalonFXControlMode.PercentOutput, armSpeed);
       linearActuatorMaster.set(TalonSRXControlMode.PercentOutput, 0);
@@ -163,12 +166,12 @@ public class Arm extends SubsystemBase {
         break;
 
       case MiddleCone:
-        inArmPistons.set(Value.kReverse);
+        inArmPistons.set(Value.kForward);
         intakePistons.set(Value.kForward);
         break;
 
       case MiddleCube:
-        inArmPistons.set(Value.kReverse);
+        inArmPistons.set(Value.kForward);
         intakePistons.set(Value.kForward);
         break;
 
@@ -183,7 +186,7 @@ public class Arm extends SubsystemBase {
         break;
 
       case LoadingStation:
-        inArmPistons.set(Value.kReverse);
+        inArmPistons.set(Value.kForward);
         intakePistons.set(Value.kForward);
         break;
 
@@ -206,7 +209,7 @@ public class Arm extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putString("state", currentState.toString());
     SmartDashboard.putNumber("armCancoder", armCanCoder.getAbsolutePosition());
-    SmartDashboard.putNumber("potentiometer", potentiometer.get());
+    SmartDashboard.putNumber("actuatorEncoder", linearActuatorMaster.getSelectedSensorPosition());
     //SmartDashboard.putData(armController);
     //SmartDashboard.putData(linearActuatorController);
     // This method will be called once per scheduler run
@@ -228,7 +231,7 @@ public class Arm extends SubsystemBase {
 
       case GroundPickup:
         linearActuatorController.setSetpoint(Constants.linearActuatortGroundPickupSetpoint);
-        armController.setSetpoint(Constants.ArmNormalGroundPickupSetpoint);
+        armController.setSetpoint(Constants.ArmGroundPickupSetpoint);
         break;
 
       case MiddleCone:

@@ -21,12 +21,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ControlArm;
+import frc.robot.commands.ControlIntake;
 import frc.robot.commands.DefaultDriveCommand;
-import frc.robot.commands.HoldIntake;
 import frc.robot.commands.IntakeGamepiece;
 import frc.robot.commands.MoveArmToSetpoint;
 import frc.robot.commands.OuttakeGamepiece;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Camera;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Arm.State;
@@ -39,6 +40,7 @@ import frc.robot.subsystems.Arm.State;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+  private final Camera camera;
   private final Drivetrain drivetrain;
   private final Intake intake;
   private final Arm arm;
@@ -46,35 +48,38 @@ public class RobotContainer {
 
   private final DefaultDriveCommand defaultDriveCommand;
   private final ControlArm controlArm;
+  private final ControlIntake controlIntake;
 
   private final XboxController controllerDriver = new XboxController(0);
   private final XboxController controllerManipulator = new XboxController(1);
 
   private SendableChooser<PathPlannerTrajectory> autoChooser = new SendableChooser<>();
 
-  private PathPlannerTrajectory Auto3High;
+  private PathPlannerTrajectory Auto2HighNoCharge;
   private PathPlannerTrajectory Auto2High;
   private PathPlannerTrajectory Test;
-  private PathPlannerTrajectory LowGoal;
+  private PathPlannerTrajectory OneCone;
+  private PathPlannerTrajectory OneConeNoCharge;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     drivetrain = new Drivetrain();
-    intake = new Intake();
     arm = new Arm();
+    intake = new Intake();
+    camera = new Camera(arm);
     // Set up the default command for the drivetrain.
     // The controls are for field-oriented driving:
     // Left stick Y axis -> forward and backwards movement
     // Left stick X axis -> left and right movement
     // Right stick X axis -> rotation
     defaultDriveCommand = new DefaultDriveCommand(
-      drivetrain,
+      drivetrain, camera,
       () -> -modifyAxis(controllerDriver.getLeftY()) * Constants.MAX_VELOCITY_METERS_PER_SECOND,
       () -> -modifyAxis(controllerDriver.getLeftX()) * Constants.MAX_VELOCITY_METERS_PER_SECOND,
       () -> -modifyAxis(controllerDriver.getRightX()) * Constants.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
-      () -> controllerDriver.getAButton()//auto balance
+      () -> controllerDriver.getAButton()
     );
     
     drivetrain.setDefaultCommand(defaultDriveCommand);
@@ -91,12 +96,20 @@ public class RobotContainer {
     
     arm.setDefaultCommand(controlArm);
 
+    controlIntake = new ControlIntake(intake, 
+      getRightTrigger(controllerDriver), 
+      controllerDriver::getRightBumper, 
+      getLeftTrigger(controllerDriver));
+
+    intake.setDefaultCommand(controlIntake);
+
     InitTrajectorys();
 
     autoChooser.setDefaultOption("Auto2High", Auto2High);
-    autoChooser.addOption("Auto3High", Auto3High);
+    autoChooser.addOption("Auto2HighNoCharge", Auto2HighNoCharge);
     autoChooser.addOption("Test", Test);
-    autoChooser.addOption("lowGoal", Auto2High);
+    autoChooser.addOption("OneCone", OneCone);
+    autoChooser.addOption("OneConeNoCharge", OneConeNoCharge);
     SmartDashboard.putData(autoChooser);
     // Configure the button bindings
     configureButtonBindings();
@@ -114,26 +127,6 @@ public class RobotContainer {
     //  button zeros the gyroscope
     new Trigger(controllerDriver::getBackButton)
       .onTrue( new InstantCommand(() -> drivetrain.zeroGyroscope()));
-
-    new Trigger(getRightTrigger(controllerDriver))
-      .and(new Trigger(getLeftTrigger(controllerDriver)).negate())
-      .whileTrue(new IntakeGamepiece(intake, true));
-
-    new Trigger(getRightTrigger(controllerDriver))
-      .and(new Trigger(getLeftTrigger(controllerDriver)))
-      .whileTrue(new IntakeGamepiece(intake, false));
-
-    new Trigger(controllerDriver::getRightBumper)
-      .and(new Trigger(getLeftTrigger(controllerDriver)).negate())
-      .whileTrue(new OuttakeGamepiece(intake, true));
-
-    new Trigger(controllerDriver::getRightBumper)
-      .and(new Trigger(getLeftTrigger(controllerDriver)))
-      .whileTrue(new OuttakeGamepiece(intake, false));
-
-    new Trigger(controllerDriver::getRightBumper)
-      .and(getRightTrigger(controllerDriver))
-      .whileFalse(new HoldIntake(intake));
 
     new Trigger(getRightTrigger(controllerManipulator))
       .onTrue(new MoveArmToSetpoint(arm, State.GroundPickup));
@@ -190,25 +183,30 @@ public class RobotContainer {
   }
 
   private void InitTrajectorys() {
-    Auto3High = PathPlanner.loadPath(
-      "Auto3High",
-      Constants.MAX_VELOCITY_METERS_PER_SECOND-1.5,
-      Constants.MAX_acceleration_METERS_PER_SECOND-1.5);
+    Auto2HighNoCharge = PathPlanner.loadPath(
+      "Auto2HighNoCharge",
+      Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
+      Constants.MAX_acceleration_METERS_PER_SECOND-1);
 
     Auto2High = PathPlanner.loadPath(
       "Auto2High",
-      Constants.MAX_VELOCITY_METERS_PER_SECOND-1.5,
-      Constants.MAX_acceleration_METERS_PER_SECOND-1.5);
+      Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
+      Constants.MAX_acceleration_METERS_PER_SECOND-1);
 
     Test = PathPlanner.loadPath(
       "Test",
-      Constants.MAX_VELOCITY_METERS_PER_SECOND-1.5,
-      Constants.MAX_acceleration_METERS_PER_SECOND-1.5);
+      Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
+      Constants.MAX_acceleration_METERS_PER_SECOND-1);
 
-    LowGoal = PathPlanner.loadPath(
-      "LowGoal",
-      Constants.MAX_VELOCITY_METERS_PER_SECOND-1.5,
-      Constants.MAX_acceleration_METERS_PER_SECOND-1.5);
+    OneCone = PathPlanner.loadPath(
+      "OneCone",
+      Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
+      Constants.MAX_acceleration_METERS_PER_SECOND-1);
+
+      OneConeNoCharge = PathPlanner.loadPath(
+      "OneConeNoCharge",
+      Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
+      Constants.MAX_acceleration_METERS_PER_SECOND-1);
   }
 
   /**
@@ -221,29 +219,31 @@ public class RobotContainer {
     // This will load the file "Example Path.path" and generate it with a max velocity of 8 m/s and a max acceleration of 5 m/s^2
     
 
-      HashMap<String, Command> eventMap = new HashMap<>();
-      eventMap.put("ToHighCone", new MoveArmToSetpoint(arm, State.HighCone).withTimeout(2.5));
-      eventMap.put("ToHighCube", new MoveArmToSetpoint(arm, State.HighCube).withTimeout(2.5));
-      eventMap.put("ToLow", new MoveArmToSetpoint(arm, State.NormalPickup));
-      eventMap.put("ToStart", new MoveArmToSetpoint(arm, State.Starting).withTimeout(2.5));
-      eventMap.put("IntakeCone", new IntakeGamepiece(intake, true).withTimeout(3));
-      eventMap.put("IntakeCube", new IntakeGamepiece(intake, false).withTimeout(2));
-      eventMap.put("OuttakeCone", new OuttakeGamepiece(intake, true).withTimeout(.5));
-      eventMap.put("OuttakeCube", new OuttakeGamepiece(intake, false).withTimeout(1));
-      //eventMap.put("AutoBalance", new AutoBalance(drivetrain));
+    HashMap<String, Command> eventMap = new HashMap<>();
+    eventMap.put("ToHighCone", new MoveArmToSetpoint(arm, State.HighCone).withTimeout(2));
+    eventMap.put("ToHighCube", new MoveArmToSetpoint(arm, State.HighCube).withTimeout(2.5));
+    eventMap.put("ToLow", new MoveArmToSetpoint(arm, State.NormalPickup).withTimeout(2.5));
+    eventMap.put("ToStart", new MoveArmToSetpoint(arm, State.Starting).withTimeout(2));
+    eventMap.put("IntakeCone", new IntakeGamepiece(intake, true).withTimeout(3));
+    eventMap.put("IntakeCube", new IntakeGamepiece(intake, false).withTimeout(.75));
+    eventMap.put("OuttakeCone", new OuttakeGamepiece(intake, true).withTimeout(.5));
+    eventMap.put("OuttakeCube", new OuttakeGamepiece(intake, false).withTimeout(1));
+    //eventMap.put("AutoBalance", new AutoBalance(drivetrain));
 
-      SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-        drivetrain::getPose, 
-        drivetrain::resetOdometry, 
-        Constants.kinematics, 
-        new PIDConstants(Constants.kPXYController, 0, 0), 
-        new PIDConstants(Constants.kPThetaController, 0, Constants.kDThetaController), 
-        drivetrain::setModuleStates, 
-        eventMap, 
-        drivetrain
-        );
-
-        Command auto = autoBuilder.fullAuto(autoChooser.getSelected());
+    SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
+      drivetrain::getPose, 
+      drivetrain::resetOdometry, 
+      Constants.kinematics, 
+      new PIDConstants(Constants.kPXYController, 0, 0), 
+      new PIDConstants(Constants.kPThetaController, 0, Constants.kDThetaController), 
+      drivetrain::setModuleStates, 
+      eventMap, 
+      true,
+      drivetrain
+      );
+      
+    
+      Command auto = autoBuilder.fullAuto(autoChooser.getSelected());
       
       
       
@@ -252,7 +252,8 @@ public class RobotContainer {
     //drivetrain.resetOdometry(examplePath.getInitialPose());
 
     // Run path following command, then stop at the end.
-    return (new MoveArmToSetpoint(arm, State.Starting).withTimeout(.01))
+    return (new MoveArmToSetpoint(arm, State.Starting).withTimeout(.001))
+    //.alongWith(new InstantCommand(() -> drivetrain.zeroGyroscope()))
     .andThen(auto)
     .andThen(() -> drivetrain.stopDrive());
 
