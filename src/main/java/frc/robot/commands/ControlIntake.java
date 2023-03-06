@@ -50,7 +50,7 @@ public class ControlIntake extends CommandBase {
       if(!isCone){
         intake.controlIntake(-Constants.intakeSpeed);
       }else{
-        intake.controlIntake(Constants.intakeSpeed);
+        intake.controlIntake(Constants.intakeSpeed-.2);
       }
     }else{
       intake.controlIntake(0);

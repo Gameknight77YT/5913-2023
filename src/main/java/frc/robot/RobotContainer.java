@@ -55,8 +55,10 @@ public class RobotContainer {
 
   private SendableChooser<PathPlannerTrajectory> autoChooser = new SendableChooser<>();
 
-  private PathPlannerTrajectory Auto2HighNoCharge;
-  private PathPlannerTrajectory Auto2High;
+  private PathPlannerTrajectory Auto2HighNoChargeBlue;
+  private PathPlannerTrajectory Auto2HighBlue;
+  private PathPlannerTrajectory Auto2HighNoChargeRed;
+  private PathPlannerTrajectory Auto2HighRed;
   private PathPlannerTrajectory Test;
   private PathPlannerTrajectory OneCone;
   private PathPlannerTrajectory OneConeNoCharge;
@@ -105,8 +107,10 @@ public class RobotContainer {
 
     InitTrajectorys();
 
-    autoChooser.setDefaultOption("Auto2High", Auto2High);
-    autoChooser.addOption("Auto2HighNoCharge", Auto2HighNoCharge);
+    autoChooser.setDefaultOption("Auto2HighRed", Auto2HighRed);
+    autoChooser.addOption("Auto2HighNoChargeRed", Auto2HighNoChargeRed);
+    autoChooser.addOption("Auto2HighBlue", Auto2HighBlue);
+    autoChooser.addOption("Auto2HighNoChargeBlue", Auto2HighNoChargeBlue);
     autoChooser.addOption("Test", Test);
     autoChooser.addOption("OneCone", OneCone);
     autoChooser.addOption("OneConeNoCharge", OneConeNoCharge);
@@ -183,13 +187,23 @@ public class RobotContainer {
   }
 
   private void InitTrajectorys() {
-    Auto2HighNoCharge = PathPlanner.loadPath(
-      "Auto2HighNoCharge",
+    Auto2HighNoChargeRed = PathPlanner.loadPath(
+      "Auto2HighNoChargeRed",
       Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
       Constants.MAX_acceleration_METERS_PER_SECOND-1);
 
-    Auto2High = PathPlanner.loadPath(
-      "Auto2High",
+    Auto2HighRed = PathPlanner.loadPath(
+      "Auto2HighRed",
+      Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
+      Constants.MAX_acceleration_METERS_PER_SECOND-1);
+
+    Auto2HighNoChargeBlue = PathPlanner.loadPath(
+      "Auto2HighNoChargeBlue",
+      Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
+      Constants.MAX_acceleration_METERS_PER_SECOND-1);
+  
+    Auto2HighBlue = PathPlanner.loadPath(
+      "Auto2HighBlue",
       Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
       Constants.MAX_acceleration_METERS_PER_SECOND-1);
 
@@ -227,7 +241,7 @@ public class RobotContainer {
     eventMap.put("IntakeCone", new IntakeGamepiece(intake, true).withTimeout(3));
     eventMap.put("IntakeCube", new IntakeGamepiece(intake, false).withTimeout(.75));
     eventMap.put("OuttakeCone", new OuttakeGamepiece(intake, true).withTimeout(.5));
-    eventMap.put("OuttakeCube", new OuttakeGamepiece(intake, false).withTimeout(1));
+    eventMap.put("OuttakeCube", new OuttakeGamepiece(intake, false).withTimeout(.5));
     //eventMap.put("AutoBalance", new AutoBalance(drivetrain));
 
     SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(

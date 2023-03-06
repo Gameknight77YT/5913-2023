@@ -67,10 +67,10 @@ public class Arm extends SubsystemBase {
     armMotor.setInverted(true);
     linearActuatorMaster.setInverted(true);
     linearActuatorFollower.setInverted(InvertType.FollowMaster);
-    armCanCoder.configSensorDirection(true);
+    armCanCoder.configSensorDirection(false);
 
     armCanCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-    armCanCoder.configMagnetOffset(360 - 320);
+    armCanCoder.configMagnetOffset(360 - -21);
 
     linearActuatorMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     //linearActuatorMaster.setSelectedSensorPosition(0);

@@ -99,7 +99,7 @@ public class DefaultDriveCommand extends CommandBase {
         }*/
 
         if(isAutoBalance.getAsBoolean()){
-            yAxisRate += camera.getMoveInput(); 
+            yAxisRate += -camera.getMoveInput(); 
         }
         
         // You can use `new ChassisSpeeds(...)` for robot-oriented movement instead of field-oriented movement
