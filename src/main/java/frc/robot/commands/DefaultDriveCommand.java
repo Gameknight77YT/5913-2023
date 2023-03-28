@@ -1,7 +1,9 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Camera;
@@ -17,41 +19,48 @@ public class DefaultDriveCommand extends CommandBase {
     private DoubleSupplier m_translationXSupplier;
     private DoubleSupplier m_translationYSupplier;
     private DoubleSupplier m_rotationSupplier;
+    private BooleanSupplier isTrack;
     private BooleanSupplier isAutoBalance;
 
-    private boolean autoBalanceXMode = false;
-    private boolean autoBalanceYMode = false;
-
     private SlewRateLimiter xLimiter, yLimiter, turningLimiter;
+
+    private double error = 0, lasterror = 0, errorrate = 0;
+    private PIDController pitchController = new PIDController(.0125, 0, 0);
+    private PIDController rollController = new PIDController(.0125, 0, 0);
 
     public DefaultDriveCommand(Drivetrain drivetrainSubsystem,
                                Camera camera,
                                DoubleSupplier translationXSupplier,
                                DoubleSupplier translationYSupplier,
                                DoubleSupplier rotationSupplier,
+                               BooleanSupplier isTrack,
                                BooleanSupplier isAutoBalance) {
         this.m_drivetrainSubsystem = drivetrainSubsystem;
         this.camera = camera;
         this.m_translationXSupplier = translationXSupplier;
         this.m_translationYSupplier = translationYSupplier;
         this.m_rotationSupplier = rotationSupplier;
+        this.isTrack = isTrack;
         this.isAutoBalance = isAutoBalance;
 
         this.xLimiter = new SlewRateLimiter(Constants.MAX_VELOCITY_METERS_PER_SECOND/.5);
         this.yLimiter = new SlewRateLimiter(Constants.MAX_VELOCITY_METERS_PER_SECOND/.5);
-        this.turningLimiter = new SlewRateLimiter(.1);
+        this.turningLimiter = new SlewRateLimiter(Constants.MAX_VELOCITY_METERS_PER_SECOND/.125);
 
         addRequirements(drivetrainSubsystem);
+
+        pitchController.setTolerance(3);
+        rollController.setTolerance(3);
+        
     }
 
     @Override
     public void execute() {
         
         //https://pdocs.kauailabs.com/navx-mxp/examples/automatic-balancing/
-        double kOffBalanceAngleThresholdDegrees = 10;
-        double kOonBalanceAngleThresholdDegrees  = 5;
+        //bad example, not working
 
-        //auto balance
+        
         double rotationRate = m_rotationSupplier.getAsDouble();
         double xAxisRate            = m_translationXSupplier.getAsDouble();
         double yAxisRate            = m_translationYSupplier.getAsDouble();
@@ -60,45 +69,27 @@ public class DefaultDriveCommand extends CommandBase {
 
         xAxisRate = xLimiter.calculate(xAxisRate);
         yAxisRate = yLimiter.calculate(yAxisRate);
-        //rotationRate = turningLimiter.calculate(rollAngleDegrees);
+        rotationRate = turningLimiter.calculate(rotationRate);
         
-        /*if(isAutoBalance.getAsBoolean()){
-            if ( !autoBalanceXMode && 
-             (Math.abs(pitchAngleDegrees) >= 
-              Math.abs(kOffBalanceAngleThresholdDegrees))) {
-            autoBalanceXMode = true;
-            }
-            else if ( autoBalanceXMode && 
-                  (Math.abs(pitchAngleDegrees) <= 
-                   Math.abs(kOonBalanceAngleThresholdDegrees))) {
-            autoBalanceXMode = false;
-            }
-            if ( !autoBalanceYMode && 
-             (Math.abs(pitchAngleDegrees) >= 
-              Math.abs(kOffBalanceAngleThresholdDegrees))) {
-            autoBalanceYMode = true;
-            }  
-            else if ( autoBalanceYMode && 
-                  (Math.abs(pitchAngleDegrees) <= 
-                   Math.abs(kOonBalanceAngleThresholdDegrees))) {
-            autoBalanceYMode = false;
-            }
+        if(isAutoBalance.getAsBoolean()){
+            
         
             // Control drive system automatically, 
             // driving in reverse direction of pitch/roll angle,
             // with a magnitude based upon the angle
-        
-            if ( autoBalanceXMode ) {
-                double pitchAngleRadians = pitchAngleDegrees * (Math.PI / 180.0);
-                xAxisRate = Math.sin(pitchAngleRadians) * -1;
-            }
-            if ( autoBalanceYMode ) {
-                double rollAngleRadians = rollAngleDegrees * (Math.PI / 180.0);
-                yAxisRate = Math.sin(rollAngleRadians) * -1;
-            }
-        }*/
+            errorrate = lasterror - error;
+           
+           if(errorrate > .25){
 
-        if(isAutoBalance.getAsBoolean()){
+           }else{
+            yAxisRate += pitchController.calculate(pitchAngleDegrees, 0);
+            xAxisRate += rollController.calculate(rollAngleDegrees, 0);
+           }
+            
+            lasterror = error;
+        }
+
+        if(isTrack.getAsBoolean()){
             yAxisRate += -camera.getMoveInput(); 
         }
         

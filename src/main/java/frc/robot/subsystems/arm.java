@@ -47,6 +47,7 @@ public class Arm extends SubsystemBase {
     HighCone,
     HighCube,
     LoadingStation,
+    LoadingStationRamp,
     other
   }
 
@@ -189,6 +190,11 @@ public class Arm extends SubsystemBase {
         inArmPistons.set(Value.kForward);
         intakePistons.set(Value.kForward);
         break;
+      
+      case LoadingStationRamp:
+        inArmPistons.set(Value.kReverse);
+        intakePistons.set(Value.kReverse);
+        break;
 
       case other:
         
@@ -257,6 +263,11 @@ public class Arm extends SubsystemBase {
       case LoadingStation:
         linearActuatorController.setSetpoint(Constants.linearActuatorLoadingStationSetpoint);
         armController.setSetpoint(Constants.ArmLoadingStationSetpoint);
+        break;
+
+      case LoadingStationRamp:
+        linearActuatorController.setSetpoint(Constants.linearActuatorLoadingStationRampSetpoint);
+        armController.setSetpoint(Constants.ArmLoadingStationRampSetpoint);
         break;
 
       case other:

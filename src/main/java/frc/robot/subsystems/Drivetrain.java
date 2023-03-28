@@ -203,7 +203,7 @@ public class Drivetrain extends SubsystemBase {
     //}
 
     // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
-    return navx.getRotation2d();//Rotation2d.fromDegrees(Math.IEEEremainder(navx.getAngle(), 360));//Rotation2d.fromDegrees(360.0 - navx.getYaw());
+    return navx.getRotation2d().rotateBy(Rotation2d.fromDegrees(180));//Rotation2d.fromDegrees(Math.IEEEremainder(navx.getAngle(), 360));//Rotation2d.fromDegrees(360.0 - navx.getYaw());
   }
 
   public double getPitch(){
@@ -268,9 +268,9 @@ public class Drivetrain extends SubsystemBase {
         
         updateOdometry();
     
-        SmartDashboard.putNumber("gyro Heading", getGyroscopeRotation().getDegrees());
+        SmartDashboard.putString("gyro", "rot: " + getGyroscopeRotation().getDegrees() + " pit: " + getPitch() + " roll: " + getRoll());
         SmartDashboard.putNumber("Robot Heading", getPose().getRotation().getDegrees());
-        SmartDashboard.putString("Robot Location", getPose().getX() + ", " + getPose().getY());
+        
         
         SwerveDriveKinematics.desaturateWheelSpeeds(
                 states, Constants.MAX_VELOCITY_METERS_PER_SECOND);

@@ -4,11 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
 
@@ -17,6 +12,10 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -27,10 +26,10 @@ import frc.robot.commands.IntakeGamepiece;
 import frc.robot.commands.MoveArmToSetpoint;
 import frc.robot.commands.OuttakeGamepiece;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Arm.State;
 import frc.robot.subsystems.Camera;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Arm.State;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -55,10 +54,10 @@ public class RobotContainer {
 
   private SendableChooser<PathPlannerTrajectory> autoChooser = new SendableChooser<>();
 
-  private PathPlannerTrajectory Auto2HighNoChargeBlue;
-  private PathPlannerTrajectory Auto2HighBlue;
-  private PathPlannerTrajectory Auto2HighNoChargeRed;
-  private PathPlannerTrajectory Auto2HighRed;
+  
+  private PathPlannerTrajectory Auto2HighNoCharge;
+  private PathPlannerTrajectory Auto3HighNoCharge;
+  private PathPlannerTrajectory Auto2High;
   private PathPlannerTrajectory Test;
   private PathPlannerTrajectory OneCone;
   private PathPlannerTrajectory OneConeNoCharge;
@@ -81,7 +80,8 @@ public class RobotContainer {
       () -> -modifyAxis(controllerDriver.getLeftY()) * Constants.MAX_VELOCITY_METERS_PER_SECOND,
       () -> -modifyAxis(controllerDriver.getLeftX()) * Constants.MAX_VELOCITY_METERS_PER_SECOND,
       () -> -modifyAxis(controllerDriver.getRightX()) * Constants.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
-      () -> controllerDriver.getAButton()
+      controllerDriver::getAButton,
+      controllerDriver::getXButton
     );
     
     drivetrain.setDefaultCommand(defaultDriveCommand);
@@ -107,10 +107,9 @@ public class RobotContainer {
 
     InitTrajectorys();
 
-    autoChooser.setDefaultOption("Auto2HighRed", Auto2HighRed);
-    autoChooser.addOption("Auto2HighNoChargeRed", Auto2HighNoChargeRed);
-    autoChooser.addOption("Auto2HighBlue", Auto2HighBlue);
-    autoChooser.addOption("Auto2HighNoChargeBlue", Auto2HighNoChargeBlue);
+    autoChooser.setDefaultOption("Auto2High", Auto2High);
+    autoChooser.addOption("Auto2HighNoCharge", Auto2HighNoCharge);
+    autoChooser.addOption("Auto3HighNoCharge", Auto3HighNoCharge);
     autoChooser.addOption("Test", Test);
     autoChooser.addOption("OneCone", OneCone);
     autoChooser.addOption("OneConeNoCharge", OneConeNoCharge);
@@ -137,6 +136,10 @@ public class RobotContainer {
 
     new Trigger(controllerManipulator::getRightBumper)
       .onTrue(new MoveArmToSetpoint(arm, State.LoadingStation));
+
+    new Trigger(controllerManipulator::getRightBumper)
+      .and(controllerManipulator::getLeftBumper)
+      .onTrue(new MoveArmToSetpoint(arm, State.LoadingStationRamp));
 
     new Trigger(controllerManipulator::getYButton)
       .and(new Trigger(controllerManipulator::getLeftBumper).negate())
@@ -187,23 +190,18 @@ public class RobotContainer {
   }
 
   private void InitTrajectorys() {
-    Auto2HighNoChargeRed = PathPlanner.loadPath(
-      "Auto2HighNoChargeRed",
+    Auto2HighNoCharge = PathPlanner.loadPath(
+      "Auto2HighNoCharge",
       Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
       Constants.MAX_acceleration_METERS_PER_SECOND-1);
 
-    Auto2HighRed = PathPlanner.loadPath(
-      "Auto2HighRed",
-      Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
-      Constants.MAX_acceleration_METERS_PER_SECOND-1);
+    Auto3HighNoCharge = PathPlanner.loadPath(
+      "Auto3HighNoCharge",
+      Constants.MAX_VELOCITY_METERS_PER_SECOND-.6,
+      Constants.MAX_acceleration_METERS_PER_SECOND-.7);
 
-    Auto2HighNoChargeBlue = PathPlanner.loadPath(
-      "Auto2HighNoChargeBlue",
-      Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
-      Constants.MAX_acceleration_METERS_PER_SECOND-1);
-  
-    Auto2HighBlue = PathPlanner.loadPath(
-      "Auto2HighBlue",
+    Auto2High = PathPlanner.loadPath(
+      "Auto2High",
       Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
       Constants.MAX_acceleration_METERS_PER_SECOND-1);
 
@@ -236,13 +234,16 @@ public class RobotContainer {
     HashMap<String, Command> eventMap = new HashMap<>();
     eventMap.put("ToHighCone", new MoveArmToSetpoint(arm, State.HighCone).withTimeout(2));
     eventMap.put("ToHighCube", new MoveArmToSetpoint(arm, State.HighCube).withTimeout(2.5));
-    eventMap.put("ToLow", new MoveArmToSetpoint(arm, State.NormalPickup).withTimeout(2.5));
+    eventMap.put("ToMidCube", new MoveArmToSetpoint(arm, State.MiddleCube).withTimeout(2));
+    eventMap.put("ToLow", new MoveArmToSetpoint(arm, State.NormalPickup).withTimeout(3.5));
     eventMap.put("ToStart", new MoveArmToSetpoint(arm, State.Starting).withTimeout(2));
+    eventMap.put("ToStartShort", new MoveArmToSetpoint(arm, State.Starting).withTimeout(.5));
     eventMap.put("IntakeCone", new IntakeGamepiece(intake, true).withTimeout(3));
-    eventMap.put("IntakeCube", new IntakeGamepiece(intake, false).withTimeout(.75));
+    eventMap.put("IntakeCube", new IntakeGamepiece(intake, false).withTimeout(1.25));
     eventMap.put("OuttakeCone", new OuttakeGamepiece(intake, true).withTimeout(.5));
     eventMap.put("OuttakeCube", new OuttakeGamepiece(intake, false).withTimeout(.5));
-    //eventMap.put("AutoBalance", new AutoBalance(drivetrain));
+    eventMap.put("AutoBalance", new DefaultDriveCommand(drivetrain, camera, () -> 0, () -> 0, 
+                                                        () -> 0, () -> false, () -> true).withTimeout(1));
 
     SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
       drivetrain::getPose, 

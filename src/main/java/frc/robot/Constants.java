@@ -141,8 +141,10 @@ public final class Constants {
     public static final double ArmHighConeSetpoint = 179; 
     public static final double linearActuatorHighCubeSetpoint = 210156;
     public static final double ArmHighCubeSetpoint = 171;
-    public static final double linearActuatorLoadingStationSetpoint = 0;
+    public static final double linearActuatorLoadingStationSetpoint = 8811;
     public static final double ArmLoadingStationSetpoint = 132;
+    public static final double linearActuatorLoadingStationRampSetpoint = 8811;
+    public static final double ArmLoadingStationRampSetpoint = 84;
 
 
 
