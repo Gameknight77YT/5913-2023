@@ -36,6 +36,7 @@ public class Arm extends SubsystemBase {
   private Compressor compressor = new Compressor(Constants.pcmID, PneumaticsModuleType.CTREPCM);
   private DoubleSolenoid inArmPistons = new DoubleSolenoid(Constants.pcmID, PneumaticsModuleType.CTREPCM, Constants.inArmPistonsForward, Constants.inArmPistonsReverse);
   private DoubleSolenoid intakePistons = new DoubleSolenoid(Constants.pcmID, PneumaticsModuleType.CTREPCM, Constants.intakePistonsForward, Constants.intakePistonsReverse);
+  private DoubleSolenoid smallPistons = new DoubleSolenoid(Constants.pcmID, PneumaticsModuleType.CTREPCM, Constants.smallPistonsForward, Constants.smallPistonsReverse);
 
   public static enum State {
     Starting,
@@ -80,6 +81,7 @@ public class Arm extends SubsystemBase {
 
     inArmPistons.set(Value.kReverse);
     intakePistons.set(Value.kReverse);
+    smallPistons.set(Value.kForward);
 
     
     armController.setTolerance(1);
@@ -93,8 +95,9 @@ public class Arm extends SubsystemBase {
     intakePistons.set(intake);
   }
 
+  
   public void toggleInArmPistions(){
-    inArmPistons.toggle();
+    smallPistons.toggle();
   }
 
   public void toggleIntakePistions(){
@@ -102,7 +105,11 @@ public class Arm extends SubsystemBase {
   }
 
   public boolean armAtSetpoint(){
-    return (Math.abs(armController.getSetpoint() - armCanCoder.getAbsolutePosition()) < 25);
+    if(DriverStation.isAutonomous()){
+      return (Math.abs(armController.getSetpoint() - armCanCoder.getAbsolutePosition()) < 25);
+    }else{
+      return (Math.abs(armController.getSetpoint() - armCanCoder.getAbsolutePosition()) < 45);
+    }
   }
 
   public boolean actuatorAtSetpoint(){
@@ -149,51 +156,61 @@ public class Arm extends SubsystemBase {
       case Starting:
         inArmPistons.set(Value.kReverse);
         intakePistons.set(Value.kReverse);
+        smallPistons.set(Value.kForward);
         break;
 
       case Tansition:
         inArmPistons.set(Value.kReverse);
         intakePistons.set(Value.kReverse);
+        smallPistons.set(Value.kForward);
         break;
 
       case NormalPickup:
         inArmPistons.set(Value.kReverse);
         intakePistons.set(Value.kForward);
+        smallPistons.set(Value.kForward);
         break;
 
       case GroundPickup:
         inArmPistons.set(Value.kForward);
         intakePistons.set(Value.kForward);
+        smallPistons.set(Value.kForward);
         break;
 
       case MiddleCone:
         inArmPistons.set(Value.kForward);
         intakePistons.set(Value.kForward);
+        smallPistons.set(Value.kForward);
         break;
 
       case MiddleCube:
         inArmPistons.set(Value.kForward);
         intakePistons.set(Value.kForward);
+        smallPistons.set(Value.kForward);
         break;
 
       case HighCone:
         inArmPistons.set(Value.kReverse);
         intakePistons.set(Value.kForward);
+        smallPistons.set(Value.kForward);
         break;
 
       case HighCube:
         inArmPistons.set(Value.kReverse);
         intakePistons.set(Value.kForward);
+        smallPistons.set(Value.kForward);
         break;
 
       case LoadingStation:
         inArmPistons.set(Value.kForward);
         intakePistons.set(Value.kForward);
+        smallPistons.set(Value.kForward);
         break;
       
       case LoadingStationRamp:
         inArmPistons.set(Value.kReverse);
         intakePistons.set(Value.kReverse);
+        smallPistons.set(Value.kReverse);
         break;
 
       case other:
@@ -210,6 +227,8 @@ public class Arm extends SubsystemBase {
     
     return armController.atSetpoint() && linearActuatorController.atSetpoint();
   }
+
+  //public void Reset
 
   @Override
   public void periodic() {

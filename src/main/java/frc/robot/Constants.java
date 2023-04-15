@@ -122,13 +122,15 @@ public final class Constants {
     public static final int inArmPistonsReverse = 3;
     public static final int intakePistonsForward = 0;
     public static final int intakePistonsReverse = 1;
+    public static final int smallPistonsForward = 4;
+    public static final int smallPistonsReverse = 5;
 
     
     public static final double intakeSpeed = .75;
     public static final double linearActuatorStartingSetpoint = 8811;
     public static final double ArmStartingSetpoint = 64;
-    public static final double linearActuatortNormalPickupSetpoint = 153820;
-    public static final double ArmNormalPickupSetpoint = 74;
+    public static final double linearActuatortNormalPickupSetpoint = 163376;
+    public static final double ArmNormalPickupSetpoint = 75;
     public static final double linearActuatorTansitionSetpoint = 8811;
     public static final double ArmTansitionSetpoint = 80;
     public static final double linearActuatortGroundPickupSetpoint = 231114;
@@ -142,9 +144,9 @@ public final class Constants {
     public static final double linearActuatorHighCubeSetpoint = 210156;
     public static final double ArmHighCubeSetpoint = 171;
     public static final double linearActuatorLoadingStationSetpoint = 8811;
-    public static final double ArmLoadingStationSetpoint = 132;
-    public static final double linearActuatorLoadingStationRampSetpoint = 8811;
-    public static final double ArmLoadingStationRampSetpoint = 84;
+    public static final double ArmLoadingStationSetpoint = 135;
+    public static final double linearActuatorLoadingStationRampSetpoint = 42485;
+    public static final double ArmLoadingStationRampSetpoint = 69;
 
 
 

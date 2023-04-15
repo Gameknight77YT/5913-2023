@@ -61,6 +61,8 @@ public class RobotContainer {
   private PathPlannerTrajectory Test;
   private PathPlannerTrajectory OneCone;
   private PathPlannerTrajectory OneConeNoCharge;
+  private PathPlannerTrajectory SideAuto;
+  private PathPlannerTrajectory Auto1Mid2High;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -68,7 +70,7 @@ public class RobotContainer {
   public RobotContainer() {
     drivetrain = new Drivetrain();
     arm = new Arm();
-    intake = new Intake();
+    intake = new Intake(arm);
     camera = new Camera(arm);
     // Set up the default command for the drivetrain.
     // The controls are for field-oriented driving:
@@ -107,12 +109,14 @@ public class RobotContainer {
 
     InitTrajectorys();
 
-    autoChooser.setDefaultOption("Auto2High", Auto2High);
+    autoChooser.addOption("Auto2High", Auto2High);
     autoChooser.addOption("Auto2HighNoCharge", Auto2HighNoCharge);
     autoChooser.addOption("Auto3HighNoCharge", Auto3HighNoCharge);
     autoChooser.addOption("Test", Test);
     autoChooser.addOption("OneCone", OneCone);
     autoChooser.addOption("OneConeNoCharge", OneConeNoCharge);
+    autoChooser.setDefaultOption("Auto1Mid2High", Auto1Mid2High);
+    autoChooser.addOption("SideAuto", SideAuto);
     SmartDashboard.putData(autoChooser);
     // Configure the button bindings
     configureButtonBindings();
@@ -214,11 +218,21 @@ public class RobotContainer {
       "OneCone",
       Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
       Constants.MAX_acceleration_METERS_PER_SECOND-1);
-
-      OneConeNoCharge = PathPlanner.loadPath(
+      
+    OneConeNoCharge = PathPlanner.loadPath(
       "OneConeNoCharge",
       Constants.MAX_VELOCITY_METERS_PER_SECOND-1,
       Constants.MAX_acceleration_METERS_PER_SECOND-1);
+
+    Auto1Mid2High = PathPlanner.loadPath(
+      "Auto1Mid2High",
+      Constants.MAX_VELOCITY_METERS_PER_SECOND,
+      Constants.MAX_acceleration_METERS_PER_SECOND-.6);
+
+    SideAuto = PathPlanner.loadPath(
+        "SideAuto",
+        Constants.MAX_VELOCITY_METERS_PER_SECOND-2.5,
+        Constants.MAX_acceleration_METERS_PER_SECOND-.6);
   }
 
   /**
@@ -234,7 +248,8 @@ public class RobotContainer {
     HashMap<String, Command> eventMap = new HashMap<>();
     eventMap.put("ToHighCone", new MoveArmToSetpoint(arm, State.HighCone).withTimeout(2));
     eventMap.put("ToHighCube", new MoveArmToSetpoint(arm, State.HighCube).withTimeout(2.5));
-    eventMap.put("ToMidCube", new MoveArmToSetpoint(arm, State.MiddleCube).withTimeout(2));
+    eventMap.put("ToMidCube", new MoveArmToSetpoint(arm, State.MiddleCube).withTimeout(1));
+    eventMap.put("ToMidCone", new MoveArmToSetpoint(arm, State.MiddleCone).withTimeout(.5));
     eventMap.put("ToLow", new MoveArmToSetpoint(arm, State.NormalPickup).withTimeout(3.5));
     eventMap.put("ToStart", new MoveArmToSetpoint(arm, State.Starting).withTimeout(2));
     eventMap.put("ToStartShort", new MoveArmToSetpoint(arm, State.Starting).withTimeout(.5));

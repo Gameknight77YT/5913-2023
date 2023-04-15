@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.led.CANdle;
+import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
@@ -14,8 +15,10 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.Arm.State;
 
 public class Intake extends SubsystemBase {
   private TalonSRX intakeMotor = new TalonSRX(Constants.intakeMotorID);
@@ -25,12 +28,19 @@ public class Intake extends SubsystemBase {
   private boolean isStall = false;
   private boolean hasStalled = false;
 
-  //TODO: private CANdle candle = new CANdle(Constants.CANdleID); 
+  private CANdle candle = new CANdle(Constants.CANdleID); 
+  private Arm arm;
 
   private boolean isCone = true;
   
   /** Creates a new Intake. */
-  public Intake() {
+  public Intake(Arm arm) {
+    this.arm = arm;
+    candle.configFactoryDefault();
+    candle.configLOSBehavior(false);
+    candle.configLEDType(LEDStripType.GRB);
+    
+    
     intakeMotor.configFactoryDefault();
 
     intakeMotor.setNeutralMode(NeutralMode.Brake);
@@ -51,22 +61,31 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    //SmartDashboard.putNumber("encoder", intakeMotor.getSelectedSensorPosition());
-    //SmartDashboard.putNumber("speed", intakeMotor.getSelectedSensorVelocity());
-    //SmartDashboard.putBoolean("isStall", isStall);
+    SmartDashboard.putNumber("encoder", intakeMotor.getSelectedSensorPosition());
+    SmartDashboard.putNumber("speed", intakeMotor.getSelectedSensorVelocity());
+    //SmartDashboard.putNumber("volt", intakeMotor.getBusVoltage());
+    //SmartDashboard.putNumber("voltOut", intakeMotor.getMotorOutputVoltage());
+    SmartDashboard.putNumber("current", intakeMotor.getSupplyCurrent());
+    SmartDashboard.putBoolean("isStall", isStall);
     //SmartDashboard.putNumber("time", RobotController.getFPGATime()/1000000);
     if(DriverStation.isDisabled() || DriverStation.isAutonomous()){
       if(DriverStation.getAlliance() == Alliance.Red){
-        //TODO: candle.setLEDs(255, 0, 0);
+        candle.setLEDs(255, 0, 0);
       }else if(DriverStation.getAlliance() == Alliance.Blue){
-        //TODO: candle.setLEDs(0, 0, 255);
+        candle.setLEDs(0, 0, 255);
+      }
+    }else if(arm.currentState != State.HighCone && arm.currentState != State.MiddleCone){
+      if(isCone){
+        candle.setLEDs(255, 0, 255);
+      }else{
+        if(DriverStation.getAlliance() == Alliance.Red){
+          candle.setLEDs(255, 0, 0);
+        }else if(DriverStation.getAlliance() == Alliance.Blue){
+          candle.setLEDs(0, 0, 255);
+        }
       }
     }else{
-      if(isCone){
-        //TODO: candle.setLEDs(237, 211, 81);
-      }else{
-        //TODO: candle.setLEDs(138, 68, 242);
-      }
+      candle.setLEDs(0, 0, 0);
     }
   }
 
@@ -85,18 +104,19 @@ public class Intake extends SubsystemBase {
         
       }
       if(time - startTime > 2*1000000){
-        if(2000 > intakeMotor.getSelectedSensorVelocity() && intakeMotor.getSelectedSensorVelocity() > 0 ){
+        if(intakeMotor.getSupplyCurrent() > 70 && intakeMotor.getSelectedSensorVelocity() > 0 ){
+        
           hasStalled = true;
           lastStallTime = time;
           
-        }else if(-5000 > intakeMotor.getSelectedSensorVelocity() && intakeMotor.getSelectedSensorVelocity() < 0 ){
+        }else if(intakeMotor.getSupplyCurrent() > 70 && intakeMotor.getSelectedSensorVelocity() < 0 ){
           hasStalled = true;
           lastStallTime = time;
           
         }
         
       }
-      if(hasStalled && time - lastStallTime > 1*1000000){
+      if(hasStalled && time - lastStallTime > .5*1000000){
         if(2000 > intakeMotor.getSelectedSensorVelocity() && intakeMotor.getSelectedSensorVelocity() > 0 ){
           isStall = true;
           lastStallTime = time;

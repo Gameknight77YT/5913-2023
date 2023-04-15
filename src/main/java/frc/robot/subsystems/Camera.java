@@ -40,19 +40,29 @@ public class Camera extends SubsystemBase {
 
     if(arm.currentState == State.HighCone || arm.currentState == State.MiddleCone){
       mainCam.setLED(VisionLEDMode.kOn);
+      intakeCam.setPipelineIndex(0);
+    }else if(arm.currentState == State.NormalPickup){
+      intakeCam.setPipelineIndex(1);
     }else{
       mainCam.setLED(VisionLEDMode.kOff);
     }
   }
 
   public double getMoveInput(){
-    double input;
-    if(mainCamResult.hasTargets() && intakeCamResult.hasTargets()){
-      input = pidController.calculate(mainCamResult.getBestTarget().getYaw() - intakeCamResult.getBestTarget().getYaw()/2.428);
-    }else{
-      input = 0;
+    double input = 0;
+    if(arm.currentState == State.HighCone || arm.currentState == State.MiddleCone){
+      if(mainCamResult.hasTargets() && intakeCamResult.hasTargets()){
+        input = pidController.calculate(mainCamResult.getBestTarget().getYaw() - intakeCamResult.getBestTarget().getYaw()/2.428);
+      }else{
+        input = 0;
+      }
+    }else if(arm.currentState == State.NormalPickup){
+      if(intakeCamResult.hasTargets()){
+        input = pidController.calculate(intakeCamResult.getBestTarget().getYaw()/2.428);
+      }else{
+        input = 0;
+      }
     }
-
     if(Math.abs(input) < .1){
       input = 0;
     }
