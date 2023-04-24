@@ -111,12 +111,12 @@ public class RobotContainer {
 
     autoChooser.addOption("Auto2High", Auto2High);
     autoChooser.addOption("Auto2HighNoCharge", Auto2HighNoCharge);
-    autoChooser.addOption("Auto3HighNoCharge", Auto3HighNoCharge);
+    autoChooser.addOption("2.5 Smooth", Auto3HighNoCharge);
     autoChooser.addOption("Test", Test);
     autoChooser.addOption("OneCone", OneCone);
     autoChooser.addOption("OneConeNoCharge", OneConeNoCharge);
-    autoChooser.setDefaultOption("Auto1Mid2High", Auto1Mid2High);
-    autoChooser.addOption("SideAuto", SideAuto);
+    autoChooser.setDefaultOption("3 Smooth", Auto1Mid2High);
+    autoChooser.addOption("2.5 Bumb", SideAuto);
     SmartDashboard.putData(autoChooser);
     // Configure the button bindings
     configureButtonBindings();
