@@ -79,9 +79,9 @@ public class Arm extends SubsystemBase {
     
     compressor.enableDigital();
 
-    inArmPistons.set(Value.kReverse);
-    intakePistons.set(Value.kReverse);
-    smallPistons.set(Value.kForward);
+    //inArmPistons.set(Value.kReverse);
+    //intakePistons.set(Value.kReverse);
+    //smallPistons.set(Value.kForward);
 
     
     armController.setTolerance(1);

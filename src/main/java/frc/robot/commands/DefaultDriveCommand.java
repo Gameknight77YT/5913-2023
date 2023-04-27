@@ -89,18 +89,17 @@ public class DefaultDriveCommand extends CommandBase {
             lasterror = error;
         }
 
-        if(isTrack.getAsBoolean()){
-            yAxisRate += -camera.getMoveInput(); 
-        }
         
+        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+            xAxisRate,
+            yAxisRate,
+            rotationRate,
+            m_drivetrainSubsystem.getGyroscopeRotation());
+        if(isTrack.getAsBoolean()){
+            speeds.vyMetersPerSecond += camera.getMoveInput();
+        }
         // You can use `new ChassisSpeeds(...)` for robot-oriented movement instead of field-oriented movement
-        m_drivetrainSubsystem.setModuleStates(Constants.kinematics.toSwerveModuleStates(
-                ChassisSpeeds.fromFieldRelativeSpeeds(
-                    xAxisRate,
-                    yAxisRate,
-                    rotationRate,
-                    m_drivetrainSubsystem.getGyroscopeRotation()
-            ))
+        m_drivetrainSubsystem.setModuleStates(Constants.kinematics.toSwerveModuleStates(speeds)
         );
     }
 

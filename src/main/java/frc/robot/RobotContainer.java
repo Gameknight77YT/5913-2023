@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ControlArm;
 import frc.robot.commands.ControlIntake;
 import frc.robot.commands.DefaultDriveCommand;
+import frc.robot.commands.GetCube;
 import frc.robot.commands.IntakeGamepiece;
 import frc.robot.commands.MoveArmToSetpoint;
 import frc.robot.commands.OuttakeGamepiece;
@@ -63,6 +64,9 @@ public class RobotContainer {
   private PathPlannerTrajectory OneConeNoCharge;
   private PathPlannerTrajectory SideAuto;
   private PathPlannerTrajectory Auto1Mid2High;
+  private PathPlannerTrajectory Smooth3_1;
+  private PathPlannerTrajectory Smooth3_2;
+  private PathPlannerTrajectory Smooth3_3;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -117,6 +121,7 @@ public class RobotContainer {
     autoChooser.addOption("OneConeNoCharge", OneConeNoCharge);
     autoChooser.setDefaultOption("3 Smooth", Auto1Mid2High);
     autoChooser.addOption("2.5 Bumb", SideAuto);
+    autoChooser.addOption("3 Smooth Cube Tracking", Smooth3_1);
     SmartDashboard.putData(autoChooser);
     // Configure the button bindings
     configureButtonBindings();
@@ -233,6 +238,21 @@ public class RobotContainer {
         "SideAuto",
         Constants.MAX_VELOCITY_METERS_PER_SECOND-2.5,
         Constants.MAX_acceleration_METERS_PER_SECOND-.6);
+
+    Smooth3_1 = PathPlanner.loadPath(
+        "Smooth3_1",
+        Constants.MAX_VELOCITY_METERS_PER_SECOND,
+        Constants.MAX_acceleration_METERS_PER_SECOND);
+
+    Smooth3_2 = PathPlanner.loadPath(
+        "Smooth3_2",
+        Constants.MAX_VELOCITY_METERS_PER_SECOND,
+        Constants.MAX_acceleration_METERS_PER_SECOND);
+
+    Smooth3_3 = PathPlanner.loadPath(
+        "Smooth3_3",
+        Constants.MAX_VELOCITY_METERS_PER_SECOND,
+        Constants.MAX_acceleration_METERS_PER_SECOND);
   }
 
   /**
@@ -257,6 +277,7 @@ public class RobotContainer {
     eventMap.put("IntakeCube", new IntakeGamepiece(intake, false).withTimeout(1.25));
     eventMap.put("OuttakeCone", new OuttakeGamepiece(intake, true).withTimeout(.5));
     eventMap.put("OuttakeCube", new OuttakeGamepiece(intake, false).withTimeout(.5));
+    eventMap.put("GetCube", new GetCube(drivetrain, camera).withTimeout(1));
     eventMap.put("AutoBalance", new DefaultDriveCommand(drivetrain, camera, () -> 0, () -> 0, 
                                                         () -> 0, () -> false, () -> true).withTimeout(1));
 
@@ -272,9 +293,19 @@ public class RobotContainer {
       drivetrain
       );
       
-    
-      Command auto = autoBuilder.fullAuto(autoChooser.getSelected());
-      
+    Command auto;
+    if(autoChooser.getSelected() == Smooth3_1){
+      auto = autoBuilder.fullAuto(Smooth3_1).withTimeout(3)
+      .andThen(new GetCube(drivetrain, camera).withTimeout(.7)
+        .alongWith(new IntakeGamepiece(intake, false)).withTimeout(1))
+      .andThen(autoBuilder.followPathWithEvents(Smooth3_2).withTimeout(5.65))
+      .andThen(new GetCube(drivetrain, camera).withTimeout(.6)
+        .alongWith(new IntakeGamepiece(intake, false)).withTimeout(.75))
+      .andThen(autoBuilder.followPathWithEvents(Smooth3_3))
+        ;
+    }else{
+      auto = autoBuilder.fullAuto(autoChooser.getSelected());
+    }  
       
       
 
