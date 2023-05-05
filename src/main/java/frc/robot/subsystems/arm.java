@@ -62,6 +62,10 @@ public class Arm extends SubsystemBase {
     linearActuatorMaster.configFactoryDefault();
     linearActuatorFollower.follow(linearActuatorMaster);
 
+    armMotor.clearStickyFaults();
+    linearActuatorMaster.clearStickyFaults();
+    linearActuatorFollower.clearStickyFaults();
+    
     armMotor.setNeutralMode(NeutralMode.Brake);
     linearActuatorMaster.setNeutralMode(NeutralMode.Brake);
     linearActuatorFollower.setNeutralMode(NeutralMode.Brake);

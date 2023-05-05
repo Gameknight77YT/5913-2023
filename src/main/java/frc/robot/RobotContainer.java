@@ -67,6 +67,10 @@ public class RobotContainer {
   private PathPlannerTrajectory Smooth3_1;
   private PathPlannerTrajectory Smooth3_2;
   private PathPlannerTrajectory Smooth3_3;
+  private PathPlannerTrajectory SideAuto_2;
+  //private PathPlannerTrajectory Bumb3_2;
+  //private PathPlannerTrajectory Bumb3_3;
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -87,7 +91,8 @@ public class RobotContainer {
       () -> -modifyAxis(controllerDriver.getLeftX()) * Constants.MAX_VELOCITY_METERS_PER_SECOND,
       () -> -modifyAxis(controllerDriver.getRightX()) * Constants.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
       controllerDriver::getAButton,
-      controllerDriver::getXButton
+      controllerDriver::getXButton,
+      arm
     );
     
     drivetrain.setDefaultCommand(defaultDriveCommand);
@@ -122,6 +127,7 @@ public class RobotContainer {
     autoChooser.setDefaultOption("3 Smooth", Auto1Mid2High);
     autoChooser.addOption("2.5 Bumb", SideAuto);
     autoChooser.addOption("3 Smooth Cube Tracking", Smooth3_1);
+    //autoChooser.addOption("3 Bumb Cube Tracking", SideAuto_2);
     SmartDashboard.putData(autoChooser);
     // Configure the button bindings
     configureButtonBindings();
@@ -236,23 +242,40 @@ public class RobotContainer {
 
     SideAuto = PathPlanner.loadPath(
         "SideAuto",
-        Constants.MAX_VELOCITY_METERS_PER_SECOND-2.5,
-        Constants.MAX_acceleration_METERS_PER_SECOND-.6);
+        Constants.MAX_VELOCITY_METERS_PER_SECOND-2,
+        Constants.MAX_acceleration_METERS_PER_SECOND-.3);
+
+    SideAuto_2 = PathPlanner.loadPath(
+        "SideAuto_2",
+        Constants.MAX_VELOCITY_METERS_PER_SECOND-2,
+        Constants.MAX_acceleration_METERS_PER_SECOND-.3);
 
     Smooth3_1 = PathPlanner.loadPath(
         "Smooth3_1",
         Constants.MAX_VELOCITY_METERS_PER_SECOND,
-        Constants.MAX_acceleration_METERS_PER_SECOND);
+        Constants.MAX_acceleration_METERS_PER_SECOND+.25);
 
     Smooth3_2 = PathPlanner.loadPath(
         "Smooth3_2",
         Constants.MAX_VELOCITY_METERS_PER_SECOND,
-        Constants.MAX_acceleration_METERS_PER_SECOND);
+        Constants.MAX_acceleration_METERS_PER_SECOND+.25);
 
     Smooth3_3 = PathPlanner.loadPath(
         "Smooth3_3",
         Constants.MAX_VELOCITY_METERS_PER_SECOND,
-        Constants.MAX_acceleration_METERS_PER_SECOND);
+        Constants.MAX_acceleration_METERS_PER_SECOND+.15);
+
+    
+        
+    /*Bumb3_2 = PathPlanner.loadPath(
+      "Bumb3_2",
+      Constants.MAX_VELOCITY_METERS_PER_SECOND-2,
+      Constants.MAX_acceleration_METERS_PER_SECOND);
+      
+    Bumb3_2 = PathPlanner.loadPath(
+      "Bumb3_2",
+      Constants.MAX_VELOCITY_METERS_PER_SECOND-2,
+      Constants.MAX_acceleration_METERS_PER_SECOND);*/
   }
 
   /**
@@ -279,7 +302,7 @@ public class RobotContainer {
     eventMap.put("OuttakeCube", new OuttakeGamepiece(intake, false).withTimeout(.5));
     eventMap.put("GetCube", new GetCube(drivetrain, camera).withTimeout(1));
     eventMap.put("AutoBalance", new DefaultDriveCommand(drivetrain, camera, () -> 0, () -> 0, 
-                                                        () -> 0, () -> false, () -> true).withTimeout(1));
+                                                        () -> 0, () -> false, () -> true, arm).withTimeout(1));
 
     SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
       drivetrain::getPose, 
@@ -295,14 +318,21 @@ public class RobotContainer {
       
     Command auto;
     if(autoChooser.getSelected() == Smooth3_1){
-      auto = autoBuilder.fullAuto(Smooth3_1).withTimeout(3)
+      auto = autoBuilder.fullAuto(Smooth3_1).withTimeout(3.25)
       .andThen(new GetCube(drivetrain, camera).withTimeout(.7)
-        .alongWith(new IntakeGamepiece(intake, false)).withTimeout(1))
-      .andThen(autoBuilder.followPathWithEvents(Smooth3_2).withTimeout(5.65))
-      .andThen(new GetCube(drivetrain, camera).withTimeout(.6)
+        .alongWith(new IntakeGamepiece(intake, false)).withTimeout(.7))
+      .andThen(autoBuilder.followPathWithEvents(Smooth3_2).withTimeout(5.5))
+      .andThen(new GetCube(drivetrain, camera).withTimeout(.85)
         .alongWith(new IntakeGamepiece(intake, false)).withTimeout(.75))
-      .andThen(autoBuilder.followPathWithEvents(Smooth3_3))
+      .andThen(autoBuilder.followPathWithEvents(Smooth3_3));
+    
+    }else if(autoChooser.getSelected() == SideAuto){
+      auto = autoBuilder.fullAuto(SideAuto).withTimeout(9.9)
+      .andThen(new GetCube(drivetrain, camera).withTimeout(.7)
+        .alongWith(new IntakeGamepiece(intake, false)).withTimeout(.7))
+      .andThen(autoBuilder.followPathWithEvents(SideAuto_2))
         ;
+    
     }else{
       auto = autoBuilder.fullAuto(autoChooser.getSelected());
     }  

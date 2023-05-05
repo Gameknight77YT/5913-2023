@@ -6,8 +6,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Camera;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Arm.State;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -15,6 +17,7 @@ import java.util.function.DoubleSupplier;
 public class DefaultDriveCommand extends CommandBase {
     private Drivetrain m_drivetrainSubsystem;
     private Camera camera;
+    private Arm arm;
 
     private DoubleSupplier m_translationXSupplier;
     private DoubleSupplier m_translationYSupplier;
@@ -34,7 +37,8 @@ public class DefaultDriveCommand extends CommandBase {
                                DoubleSupplier translationYSupplier,
                                DoubleSupplier rotationSupplier,
                                BooleanSupplier isTrack,
-                               BooleanSupplier isAutoBalance) {
+                               BooleanSupplier isAutoBalance,
+                               Arm arm) {
         this.m_drivetrainSubsystem = drivetrainSubsystem;
         this.camera = camera;
         this.m_translationXSupplier = translationXSupplier;
@@ -89,7 +93,13 @@ public class DefaultDriveCommand extends CommandBase {
             lasterror = error;
         }
 
-        
+        try {
+            if(arm.currentState == State.HighCone || arm.currentState == State.HighCube){
+                rotationRate = rotationRate/2;
+            }
+        } catch (Exception e) {
+            
+        }
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
             xAxisRate,
             yAxisRate,

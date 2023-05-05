@@ -2,15 +2,15 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 6.439497152334054,
-        "y": 3.375322053820239
+        "x": 6.734010619128072,
+        "y": 1.8629556027158252
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.579836222232599,
-        "y": 4.115585632518715
+        "x": 5.906188982734077,
+        "y": 1.3296474331158479
       },
-      "holonomicAngle": -36.02737338510358,
+      "holonomicAngle": 38.6598082540901,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -24,16 +24,16 @@
     },
     {
       "anchorPoint": {
-        "x": 4.131148358543109,
-        "y": 4.4658178633007894
+        "x": 4.497300236178913,
+        "y": 0.9555357320531775
       },
       "prevControl": {
-        "x": 4.999259257692967,
-        "y": 4.453051526548586
+        "x": 5.483087453181644,
+        "y": 0.9089871442495535
       },
       "nextControl": {
-        "x": 3.5898803655162657,
-        "y": 4.473777686727654
+        "x": 3.5115130191761823,
+        "y": 1.0020843198568015
       },
       "holonomicAngle": 180.0,
       "isReversal": false,
@@ -49,12 +49,12 @@
     },
     {
       "anchorPoint": {
-        "x": 1.8307593881790265,
-        "y": 4.290701747909752
+        "x": 1.87,
+        "y": 1.0192143194681005
       },
       "prevControl": {
-        "x": 2.7461390822685403,
-        "y": 4.441938393020194
+        "x": 2.7979348731940963,
+        "y": 0.9827899376684224
       },
       "nextControl": null,
       "holonomicAngle": 180.0,
@@ -63,10 +63,8 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "OuttakeCube"
-        ],
-        "executionBehavior": "sequential",
+        "names": [],
+        "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
       }
@@ -76,11 +74,11 @@
     {
       "position": 0.09090909090909091,
       "names": [
-        "ToHighCone"
+        "ToCubeHigh"
       ]
     },
     {
-      "position": 1.94,
+      "position": 1.9454545454545389,
       "names": [
         "OuttakeCube"
       ]
