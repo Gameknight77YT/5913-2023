@@ -15,7 +15,7 @@ import frc.robot.subsystems.Arm.State;
 
 public class Camera extends SubsystemBase {
   private PhotonCamera mainCam = new PhotonCamera("OV5647");
-  private PhotonCamera intakeCam = new PhotonCamera("Microsoft_LifeCam_HD-3000");
+  private PhotonCamera intakeCam = new PhotonCamera("USB_CAMERA");
 
   private PhotonPipelineResult mainCamResult = null;
   private PhotonPipelineResult intakeCamResult = null;

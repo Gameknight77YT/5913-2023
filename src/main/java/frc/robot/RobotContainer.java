@@ -127,7 +127,7 @@ public class RobotContainer {
     autoChooser.setDefaultOption("3 Smooth", Auto1Mid2High);
     autoChooser.addOption("2.5 Bumb", SideAuto);
     autoChooser.addOption("3 Smooth Cube Tracking", Smooth3_1);
-    //autoChooser.addOption("3 Bumb Cube Tracking", SideAuto_2);
+    autoChooser.addOption("3 Bumb Cube Tracking", SideAuto_2);
     SmartDashboard.putData(autoChooser);
     // Configure the button bindings
     configureButtonBindings();
@@ -319,12 +319,13 @@ public class RobotContainer {
     Command auto;
     if(autoChooser.getSelected() == Smooth3_1){
       auto = autoBuilder.fullAuto(Smooth3_1).withTimeout(3.25)
-      .andThen(new GetCube(drivetrain, camera).withTimeout(.7)
-        .alongWith(new IntakeGamepiece(intake, false)).withTimeout(.7))
+      .andThen(new GetCube(drivetrain, camera).withTimeout(.6)
+        .alongWith(new IntakeGamepiece(intake, false)).withTimeout(.6))
       .andThen(autoBuilder.followPathWithEvents(Smooth3_2).withTimeout(5.5))
       .andThen(new GetCube(drivetrain, camera).withTimeout(.85)
         .alongWith(new IntakeGamepiece(intake, false)).withTimeout(.75))
-      .andThen(autoBuilder.followPathWithEvents(Smooth3_3));
+      .andThen(autoBuilder.followPathWithEvents(Smooth3_3))
+      ;
     
     }else if(autoChooser.getSelected() == SideAuto){
       auto = autoBuilder.fullAuto(SideAuto).withTimeout(9.9)

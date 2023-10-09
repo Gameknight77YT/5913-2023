@@ -35,9 +35,6 @@ public class GetCube extends CommandBase {
 
     @Override
     public void execute() {
-        
-        //https://pdocs.kauailabs.com/navx-mxp/examples/automatic-balancing/
-        //bad example, not working
 
         
         double xAxisRate            = 0;

@@ -81,7 +81,7 @@ public class Arm extends SubsystemBase {
     linearActuatorMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     //linearActuatorMaster.setSelectedSensorPosition(0);
     
-    compressor.enableDigital();
+    //compressor.enableDigital();
 
     //inArmPistons.set(Value.kReverse);
     //intakePistons.set(Value.kReverse);
@@ -236,6 +236,7 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("air pressure", compressor.getPressure());
     SmartDashboard.putString("state", currentState.toString());
     SmartDashboard.putNumber("armCancoder", armCanCoder.getAbsolutePosition());
     SmartDashboard.putNumber("actuatorEncoder", linearActuatorMaster.getSelectedSensorPosition());
