@@ -319,11 +319,11 @@ public class RobotContainer {
     Command auto;
     if(autoChooser.getSelected() == Smooth3_1){
       auto = autoBuilder.fullAuto(Smooth3_1).withTimeout(3.25)
-      .andThen(new GetCube(drivetrain, camera).withTimeout(.6)
-        .alongWith(new IntakeGamepiece(intake, false)).withTimeout(.6))
+      .andThen(new GetCube(drivetrain, camera).withTimeout(.5)
+        .alongWith(new IntakeGamepiece(intake, false)).withTimeout(.5))
       .andThen(autoBuilder.followPathWithEvents(Smooth3_2).withTimeout(5.5))
-      .andThen(new GetCube(drivetrain, camera).withTimeout(.85)
-        .alongWith(new IntakeGamepiece(intake, false)).withTimeout(.75))
+      .andThen(new GetCube(drivetrain, camera).withTimeout(.95)
+        .alongWith(new IntakeGamepiece(intake, false)).withTimeout(.95))
       .andThen(autoBuilder.followPathWithEvents(Smooth3_3))
       ;
     
